@@ -6,6 +6,7 @@
   "scripts": {
     "commit": "./node_modules/.bin/git-cz",
     "test": "./node_modules/.bin/mocha src/index.spec.js -w",
+    "test:single": "./node_modules/.bin/mocha src/index.spec.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
