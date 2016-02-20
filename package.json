@@ -1,0 +1,25 @@
+{
+  "name": "mongoose-schema-to-typescript-interface",
+  "version": "1.0.0",
+  "description": "Generates TypeScript interfaces from Mongoose Schemas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JamesHenry/mongoose-schema-to-typescript-interface.git"
+  },
+  "keywords": [
+    "mongoose",
+    "typescript",
+    "schema",
+    "interface"
+  ],
+  "author": "James Henry <james@henry.sc>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface/issues"
+  },
+  "homepage": "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface#readme"
+}
