@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "commit": "./node_modules/.bin/git-cz",
-    "test": "./node_modules/.bin/mocha src/index.spec.js -w",
-    "test:single": "./node_modules/.bin/mocha src/index.spec.js",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "test": "./node_modules/.bin/tsc && ./node_modules/.bin/mocha src/*.spec.js -w",
+    "test:single": "./node_modules/.bin/tsc && ./node_modules/.bin/mocha src/*.spec.js",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "typings-install": "./node_modules/.bin/typings install",
+    "postinstall": "npm run typings-install",
+    "prepublish": "./node_modules/.bin/tsc"
   },
   "repository": {
     "type": "git",
@@ -31,14 +34,16 @@
     "cz-conventional-changelog": "1.1.5",
     "ghooks": "1.0.3",
     "mocha": "2.4.5",
-    "semantic-release": "^4.3.5"
+    "semantic-release": "^4.3.5",
+    "typescript": "1.8.0",
+    "typings": "0.6.8"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     },
     "ghooks": {
-    	"pre-commit": "npm run test:single"
+      "pre-commit": "npm run test:single"
     }
   }
 }

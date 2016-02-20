@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"module": "commonjs",
+		"target": "ES5",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"declaration": true
+	},
+	"files": [
+		"./src/generate-interface.ts",
+		"./src/generate-interface.spec.ts",
+		"./typings/main.d.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}
