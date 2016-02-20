@@ -1,14 +1,15 @@
 {
   "name": "mongoose-schema-to-typescript-interface",
-  "version": "1.0.0",
+  "version": "0.0.0-semantically-released",
   "description": "Generates TypeScript interfaces from Mongoose Schemas",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JamesHenry/mongoose-schema-to-typescript-interface.git"
+    "url": "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface.git"
   },
   "keywords": [
     "mongoose",
@@ -21,5 +22,15 @@
   "bugs": {
     "url": "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface/issues"
   },
-  "homepage": "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface#readme"
+  "homepage": "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface#readme",
+  "devDependencies": {
+    "commitizen": "2.5.0",
+    "cz-conventional-changelog": "1.1.5",
+    "semantic-release": "^4.3.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"  
+    }
+  }
 }
