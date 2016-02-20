@@ -4,6 +4,7 @@
   "description": "Generates TypeScript interfaces from Mongoose Schemas",
   "main": "index.js",
   "scripts": {
+    "commit": "./node_modules/.bin/git-cz",
     "test": "echo \"Error: no test specified\" && exit 1",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
