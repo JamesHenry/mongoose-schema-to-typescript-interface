@@ -35,7 +35,6 @@
     "cz-conventional-changelog": "1.1.5",
     "ghooks": "1.0.3",
     "mocha": "2.4.5",
-    "mongoose": "4.4.4",
     "semantic-release": "^4.3.5",
     "tslint": "3.2.1",
     "tslint-eslint-rules": "1.0.1",
@@ -47,7 +46,12 @@
       "path": "./node_modules/cz-conventional-changelog"
     },
     "ghooks": {
-    	"pre-commit": "npm run lint"
+      "pre-commit": "npm run lint"
     }
+  },
+  "dependencies": {
+    "lodash.camelcase": "4.1.0",
+    "lodash.upperfirst": "4.1.1",
+    "mongoose": "4.4.4"
   }
 }

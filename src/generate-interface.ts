@@ -1,117 +1,174 @@
 import { Schema } from 'mongoose'
+const camelCase = require('lodash.camelcase')
+const upperFirst = require('lodash.upperfirst')
 
-function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
+/**
+ * Internal constants
+ */
+const INDENT_CHAR = '\t'
+const NEWLINE_CHAR = '\n'
+const INTERFACE_PREFIX = 'I'
+const TYPESCRIPT_TYPES = {
+	STRING: 'string',
+	NUMBER: 'number',
+	BOOLEAN: 'boolean',
+	DATE: 'Date',
+	OBJECT_LITERAL: '{}',
+	ANY: 'any',
+	ARRAY_THEREOF: '[]',
+	OPTIONAL_PROP: '?',
+}
 
-	let mainString = ''
+/**
+ * Prepend a given string with the indentation character
+ * @private
+ */
+function indent(str: string): string {
+	return `${INDENT_CHAR}${str}`
+}
+
+/**
+ * Append the newline character to a given string
+ * @private
+ */
+function appendNewline(str: string): string {
+	return `${str}${NEWLINE_CHAR}`
+}
+
+/**
+ * Format a given nested interface name
+ * @private
+ */
+function formatNestedInterfaceName(name: string): string {
+	return upperFirst(camelCase(name))
+}
+
+/**
+ * Return true if the given mongoose field config is a nested schema object
+ * @private
+ */
+function isNestedSchemaType(fieldConfig: any): boolean {
+	return !fieldConfig.type && Object.keys(fieldConfig).length > 0
+}
+
+/**
+ * For a given mongoose schema type, return the relevant TypeScript type as a string
+ * @private
+ */
+function getTypeScriptTypeAsString( mongooseType: any ): string {
+
+	switch (true) {
+
+		case mongooseType === String:
+		case mongooseType === Schema.Types.ObjectId:
+
+			return TYPESCRIPT_TYPES.STRING
+
+		case mongooseType === Number:
+
+			return TYPESCRIPT_TYPES.NUMBER
+
+		case mongooseType === Schema.Types.Mixed:
+
+			return TYPESCRIPT_TYPES.OBJECT_LITERAL
+
+		case mongooseType === Date:
+
+			return TYPESCRIPT_TYPES.DATE
+
+		case mongooseType === Boolean:
+
+			return TYPESCRIPT_TYPES.BOOLEAN
+
+		case Array.isArray(mongooseType) === true:
+
+			if (!mongooseType.length) {
+				return `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+			}
+
+			const arrayOfType = mongooseType[0]
+
+			return `${getTypeScriptTypeAsString(arrayOfType)}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+
+		default:
+
+			throw new Error(`Mongoose type not recognised/supported: ${mongooseType}`)
+
+	}
+
+}
+
+/**
+ * For the `rawSchema`, generate a TypeScript interface under the given `interfaceName`,
+ * and any requisite nested interfaces
+ * @public
+ */
+function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string {
+
+	let generatedContent = ''
 
 	function generateFieldTypeString(fieldName: string, fieldConfig: any) {
 
 		let interfaceString = ''
 
-		switch (true) {
+		/**
+		 * Create nested interfaces, if applicable
+		 */
+		if (isNestedSchemaType(fieldConfig)) {
 
-			case fieldConfig.type === String:
-			case fieldConfig.type === Schema.Types.ObjectId:
+			const nestedInterfaceName = formatNestedInterfaceName(fieldName)
+			const nestedInterface = generateInterface(nestedInterfaceName, fieldConfig)
 
-				interfaceString += 'string'
+			generatedContent += appendNewline(nestedInterface)
 
-				break
-
-			case fieldConfig.type === Number:
-
-				interfaceString += 'number'
-
-				break
-
-			case fieldConfig.type === Boolean:
-
-				interfaceString += 'boolean'
-
-				break
-
-			case Array.isArray(fieldConfig.type) === true:
-
-				const arrayOfType = fieldConfig.type[0]
-
-				switch (true) {
-
-					case arrayOfType === String:
-					case arrayOfType === Schema.Types.ObjectId:
-
-						interfaceString += 'string'
-
-						break
-
-					case arrayOfType === Number:
-
-						interfaceString += 'number'
-
-						break
-
-					case arrayOfType === Boolean:
-
-						interfaceString += 'boolean'
-
-						break
-
-					default:
-						console.warn('Array type not recognised', fieldConfig)
-
-				}
-
-				interfaceString += '[]'
-
-				break
-
-			case !fieldConfig.type && Object.keys(fieldConfig).length > 0:
-
-				const nestedInterface = generateInterface(fieldName, fieldConfig)
-				mainString += nestedInterface + '\n\n'
-
-				interfaceString += fieldName
-
-				break
-
-			default:
-				console.warn('Field type not recognised', fieldConfig)
+			return `${INTERFACE_PREFIX}${nestedInterfaceName}`
 
 		}
 
-		return interfaceString
+		return getTypeScriptTypeAsString(fieldConfig.type)
 
 	}
 
 	function generateInterface(name: string, fromSchema: any) {
 
-		let interfaceString = 'interface ' + name + ' {\n'
+		const fields = Object.keys(fromSchema)
+		let interfaceString = `interface ${INTERFACE_PREFIX}${name} {`
 
-		Object.keys(fromSchema).forEach((fieldName) => {
+		if ( fields.length ) {
+			interfaceString = appendNewline(interfaceString)
+		}
+
+		fields.forEach((fieldName, index) => {
 
 			const fieldConfig = fromSchema[fieldName]
 
-			interfaceString += '\t' + fieldName
+			interfaceString += indent(fieldName)
 
-			if (!fieldConfig.required) {
-				interfaceString += '?'
+			if (!isNestedSchemaType(fieldConfig) && !fieldConfig.required) {
+				interfaceString += TYPESCRIPT_TYPES.OPTIONAL_PROP
 			}
 
 			interfaceString += ': ' + generateFieldTypeString(fieldName, fieldConfig)
 
-			interfaceString += ';\n'
+			interfaceString += ';'
+
+			if (index === fields.length - 1) {
+				interfaceString = appendNewline(interfaceString)
+			}
 
 		})
 
-		interfaceString += '}'
+		interfaceString += appendNewline('}')
 
 		return interfaceString
 
 	}
 
-	const accountInterface = generateInterface(interfaceName, rawSchema)
+	const mainInterface = generateInterface(interfaceName, rawSchema)
 
-	mainString += '\n' + accountInterface
+	generatedContent += mainInterface
 
-	return mainString
+	return generatedContent
 
 }
 
