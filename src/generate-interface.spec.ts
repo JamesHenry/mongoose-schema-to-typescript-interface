@@ -7,7 +7,6 @@ describe(`generateInterface`, () => {
 
 	it(`should return a stringified TypeScript interface`, () => {
 
-
 		const input = generateInterface(`EmptyInterface`, {})
 		const output = `interface IEmptyInterface {}
 `

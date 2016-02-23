@@ -2,16 +2,16 @@
   "name": "mongoose-schema-to-typescript-interface",
   "version": "0.0.0-semantically-released",
   "description": "Generates TypeScript interfaces from Mongoose Schemas",
-  "main": "index.js",
+  "main": "./dist/generate-interface.js",
   "scripts": {
     "commit": "./node_modules/.bin/git-cz",
-    "test": "./node_modules/.bin/tsc && ./node_modules/.bin/mocha src/*.spec.js -w",
-    "test:single": "./node_modules/.bin/tsc && ./node_modules/.bin/mocha src/*.spec.js",
+    "test": "./node_modules/.bin/tsc --outDir ./dist/ && ./node_modules/.bin/mocha ./dist/*.spec.js -w",
+    "test:single": "./node_modules/.bin/tsc --outDir ./dist/ && ./node_modules/.bin/mocha ./dist/*.spec.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "typings-install": "./node_modules/.bin/typings install",
     "postinstall": "npm run typings-install",
     "lint": "./node_modules/.bin/tslint ./src/**/*.ts",
-    "prepublish": "./node_modules/.bin/tsc"
+    "prepublish": "./node_modules/.bin/tsc --outDir ./dist/"
   },
   "repository": {
     "type": "git",
