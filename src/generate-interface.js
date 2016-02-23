@@ -1,10 +1,12 @@
+"use strict";
+var mongoose_1 = require('mongoose');
 function typescriptInterfaceGenerator(interfaceName, rawSchema) {
     var mainString = '';
     function generateFieldTypeString(fieldName, fieldConfig) {
         var interfaceString = '';
         switch (true) {
             case fieldConfig.type === String:
-                // case fieldConfig.type === schema.Types.ObjectId:
+            case fieldConfig.type === mongoose_1.Schema.Types.ObjectId:
                 interfaceString += 'string';
                 break;
             case fieldConfig.type === Number:
@@ -17,7 +19,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                 var arrayOfType = fieldConfig.type[0];
                 switch (true) {
                     case arrayOfType === String:
-                        // case arrayOfType === schema.Types.ObjectId:
+                    case arrayOfType === mongoose_1.Schema.Types.ObjectId:
                         interfaceString += 'string';
                         break;
                     case arrayOfType === Number:
@@ -50,7 +52,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                 interfaceString += '?';
             }
             interfaceString += ': ' + generateFieldTypeString(fieldName, fieldConfig);
-            interfaceString += '\n';
+            interfaceString += ';\n';
         });
         interfaceString += '}';
         return interfaceString;
@@ -59,5 +61,6 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
     mainString += '\n' + accountInterface;
     return mainString;
 }
-module.exports = typescriptInterfaceGenerator;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = typescriptInterfaceGenerator;
 //# sourceMappingURL=generate-interface.js.map

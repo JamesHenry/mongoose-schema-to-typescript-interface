@@ -34,6 +34,7 @@
     "cz-conventional-changelog": "1.1.5",
     "ghooks": "1.0.3",
     "mocha": "2.4.5",
+    "mongoose": "4.4.4",
     "semantic-release": "^4.3.5",
     "typescript": "1.8.0",
     "typings": "0.6.8"

@@ -1,3 +1,5 @@
+import { Schema } from 'mongoose'
+
 function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 
 	let mainString = ''
@@ -9,7 +11,7 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 		switch (true) {
 
 			case fieldConfig.type === String:
-			// case fieldConfig.type === schema.Types.ObjectId:
+            case fieldConfig.type === Schema.Types.ObjectId:
 
 				interfaceString += 'string'
 
@@ -33,8 +35,8 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 
 				switch (true) {
 
-					case arrayOfType === String:
-					// case arrayOfType === schema.Types.ObjectId:
+                    case arrayOfType === String:
+                    case arrayOfType === Schema.Types.ObjectId:
 
 						interfaceString += 'string'
 
@@ -95,7 +97,7 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 
 			interfaceString += ': ' + generateFieldTypeString(fieldName, fieldConfig)
 
-			interfaceString += '\n'
+			interfaceString += ';\n'
 
 		})
 
@@ -113,4 +115,4 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 
 }
 
-module.exports = typescriptInterfaceGenerator
+export default typescriptInterfaceGenerator
