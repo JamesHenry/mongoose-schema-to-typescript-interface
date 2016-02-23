@@ -55,44 +55,38 @@ function isNestedSchemaType(fieldConfig: any): boolean {
  * For a given mongoose schema type, return the relevant TypeScript type as a string
  * @private
  */
-function getTypeScriptTypeAsString( mongooseType: any ): string {
+function getTypeScriptTypeFromMongooseType(mongooseType: any): string {
 
 	switch (true) {
 
-		case mongooseType === String:
-		case mongooseType === Schema.Types.ObjectId:
+	case mongooseType === String:
+	case mongooseType === Schema.Types.ObjectId:
+		return TYPESCRIPT_TYPES.STRING
 
-			return TYPESCRIPT_TYPES.STRING
+	case mongooseType === Number:
+		return TYPESCRIPT_TYPES.NUMBER
 
-		case mongooseType === Number:
+	case mongooseType === Schema.Types.Mixed:
+		return TYPESCRIPT_TYPES.OBJECT_LITERAL
 
-			return TYPESCRIPT_TYPES.NUMBER
+	case mongooseType === Date:
+		return TYPESCRIPT_TYPES.DATE
 
-		case mongooseType === Schema.Types.Mixed:
+	case mongooseType === Boolean:
+		return TYPESCRIPT_TYPES.BOOLEAN
 
-			return TYPESCRIPT_TYPES.OBJECT_LITERAL
+	case Array.isArray(mongooseType) === true:
 
-		case mongooseType === Date:
+		if (!mongooseType.length) {
+			return `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+		}
 
-			return TYPESCRIPT_TYPES.DATE
+		const arrayOfType = mongooseType[0]
 
-		case mongooseType === Boolean:
+		return `${getTypeScriptTypeFromMongooseType(arrayOfType)}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
 
-			return TYPESCRIPT_TYPES.BOOLEAN
-
-		case Array.isArray(mongooseType) === true:
-
-			if (!mongooseType.length) {
-				return `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
-			}
-
-			const arrayOfType = mongooseType[0]
-
-			return `${getTypeScriptTypeAsString(arrayOfType)}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
-
-		default:
-
-			throw new Error(`Mongoose type not recognised/supported: ${mongooseType}`)
+	default:
+		throw new Error(`Mongoose type not recognised/supported: ${mongooseType}`)
 
 	}
 
@@ -125,7 +119,7 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): st
 
 		}
 
-		return getTypeScriptTypeAsString(fieldConfig.type)
+		return getTypeScriptTypeFromMongooseType(fieldConfig.type)
 
 	}
 

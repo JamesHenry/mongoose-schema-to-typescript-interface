@@ -50,7 +50,7 @@ function isNestedSchemaType(fieldConfig) {
  * For a given mongoose schema type, return the relevant TypeScript type as a string
  * @private
  */
-function getTypeScriptTypeAsString(mongooseType) {
+function getTypeScriptTypeFromMongooseType(mongooseType) {
     switch (true) {
         case mongooseType === String:
         case mongooseType === mongoose_1.Schema.Types.ObjectId:
@@ -68,7 +68,7 @@ function getTypeScriptTypeAsString(mongooseType) {
                 return "" + TYPESCRIPT_TYPES.ANY + TYPESCRIPT_TYPES.ARRAY_THEREOF;
             }
             var arrayOfType = mongooseType[0];
-            return "" + getTypeScriptTypeAsString(arrayOfType) + TYPESCRIPT_TYPES.ARRAY_THEREOF;
+            return "" + getTypeScriptTypeFromMongooseType(arrayOfType) + TYPESCRIPT_TYPES.ARRAY_THEREOF;
         default:
             throw new Error("Mongoose type not recognised/supported: " + mongooseType);
     }
@@ -91,7 +91,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
             generatedContent += appendNewline(nestedInterface);
             return "" + INTERFACE_PREFIX + nestedInterfaceName;
         }
-        return getTypeScriptTypeAsString(fieldConfig.type);
+        return getTypeScriptTypeFromMongooseType(fieldConfig.type);
     }
     function generateInterface(name, fromSchema) {
         var fields = Object.keys(fromSchema);
