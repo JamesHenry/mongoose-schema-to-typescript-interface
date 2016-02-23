@@ -10,6 +10,7 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "typings-install": "./node_modules/.bin/typings install",
     "postinstall": "npm run typings-install",
+    "lint": "./node_modules/.bin/tslint ./src/**/*.ts",
     "prepublish": "./node_modules/.bin/tsc"
   },
   "repository": {
@@ -36,12 +37,17 @@
     "mocha": "2.4.5",
     "mongoose": "4.4.4",
     "semantic-release": "^4.3.5",
+    "tslint": "3.2.1",
+    "tslint-eslint-rules": "1.0.1",
     "typescript": "1.8.0",
     "typings": "0.6.8"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    }
+    },
+    "ghooks": {
+    	"precommit": "npm run lint"
+    },
   }
 }
