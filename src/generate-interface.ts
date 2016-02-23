@@ -11,7 +11,7 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 		switch (true) {
 
 			case fieldConfig.type === String:
-            case fieldConfig.type === Schema.Types.ObjectId:
+			case fieldConfig.type === Schema.Types.ObjectId:
 
 				interfaceString += 'string'
 
@@ -35,8 +35,8 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any) {
 
 				switch (true) {
 
-                    case arrayOfType === String:
-                    case arrayOfType === Schema.Types.ObjectId:
+					case arrayOfType === String:
+					case arrayOfType === Schema.Types.ObjectId:
 
 						interfaceString += 'string'
 
