@@ -193,5 +193,19 @@ describe("generateInterface", function () {
         var output = "interface ISnakeCase {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tsnake_case: ISnakeCase;\n}\n";
         chai_1.expect(input).to.equal(output);
     });
+    it("should support multiple schema fields on newlines", function () {
+        var input = generateInterface("MultipleFieldsInterface", {
+            field1: {
+                type: String,
+                required: true,
+            },
+            field2: {
+                type: String,
+                required: true,
+            },
+        });
+        var output = "interface IMultipleFieldsInterface {\n\tfield1: string;\n\tfield2: string;\n}\n";
+        chai_1.expect(input).to.equal(output);
+    });
 });
 //# sourceMappingURL=generate-interface.spec.js.map

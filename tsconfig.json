@@ -9,6 +9,7 @@
 		"declaration": true
 	},
 	"files": [
+		"./src/ms2tsi.ts",
 		"./src/generate-interface.ts",
 		"./src/generate-interface.spec.ts",
 		"./typings/main.d.ts"

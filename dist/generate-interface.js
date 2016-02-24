@@ -132,9 +132,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
             }
             interfaceString += ': ' + generateFieldTypeString(fieldName, fieldConfig);
             interfaceString += ';';
-            if (index === fields.length - 1) {
-                interfaceString = appendNewline(interfaceString);
-            }
+            interfaceString = appendNewline(interfaceString);
         });
         interfaceString += appendNewline('}');
         return interfaceString;
