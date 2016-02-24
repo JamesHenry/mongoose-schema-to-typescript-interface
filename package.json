@@ -51,6 +51,9 @@
       "pre-commit": "npm run lint"
     }
   },
+  "bin": {
+  	"ms2tsi": "bin/ms2tsi.js"
+  },
   "dependencies": {
     "commander": "2.9.0",
     "lodash.camelcase": "4.1.0",
