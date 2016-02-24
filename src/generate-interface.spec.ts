@@ -87,6 +87,25 @@ describe(`generateInterface`, () => {
 
 	})
 
+	it(`should convert mongoose 'type: String' and 'enum: [...]' to TypeScript 'string literal type'`, () => {
+
+		const input = generateInterface(`StringOptionsInterface`, {
+			chosen_letter: {
+				type: String,
+				enum: [ 'a', 'b', 'c' ],
+				required: true,
+			},
+		})
+
+		const output = `interface IStringOptionsInterface {
+	chosen_letter: 'a' | 'b' | 'c';
+}
+`
+
+		expect(input).to.equal(output)
+
+	})
+
 	it(`should convert mongoose 'type: Number' to TypeScript type 'number'`, () => {
 
 		const input = generateInterface(`AgeNumberInterface`, {

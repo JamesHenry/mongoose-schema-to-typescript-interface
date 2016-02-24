@@ -47,6 +47,27 @@ function isNestedSchemaType(fieldConfig) {
     return !fieldConfig.type && Object.keys(fieldConfig).length > 0;
 }
 /**
+ * Return true if the given mongoose field config has enum values
+ * @private
+ */
+function hasEnumValues(fieldConfig) {
+    return fieldConfig.enum && fieldConfig.enum.length;
+}
+/**
+ * Convert an array of strings into a stringified TypeScript string literal type
+ * @private
+ */
+function generateStringLiteralTypeFromEnum(enumOptions) {
+    var stringLiteralStr = "";
+    enumOptions.forEach(function (option, index) {
+        stringLiteralStr += "'" + option + "'";
+        if (index !== enumOptions.length - 1) {
+            stringLiteralStr += " | ";
+        }
+    });
+    return stringLiteralStr;
+}
+/**
  * For a given mongoose schema type, return the relevant TypeScript type as a string
  * @private
  */
@@ -91,7 +112,11 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
             generatedContent += appendNewline(nestedInterface);
             return "" + INTERFACE_PREFIX + nestedInterfaceName;
         }
-        return getTypeScriptTypeFromMongooseType(fieldConfig.type);
+        var typeString = getTypeScriptTypeFromMongooseType(fieldConfig.type);
+        if (typeString === TYPESCRIPT_TYPES.STRING && hasEnumValues(fieldConfig)) {
+            return generateStringLiteralTypeFromEnum(fieldConfig.enum);
+        }
+        return typeString;
     }
     function generateInterface(name, fromSchema) {
         var fields = Object.keys(fromSchema);

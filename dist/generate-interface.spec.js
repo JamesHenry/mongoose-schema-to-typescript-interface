@@ -48,6 +48,17 @@ describe("generateInterface", function () {
         var output = "interface INameStringInterface {\n\tname: string;\n}\n";
         chai_1.expect(input).to.equal(output);
     });
+    it("should convert mongoose 'type: String' and 'enum: [...]' to TypeScript 'string literal type'", function () {
+        var input = generateInterface("StringOptionsInterface", {
+            chosen_letter: {
+                type: String,
+                enum: ['a', 'b', 'c'],
+                required: true,
+            },
+        });
+        var output = "interface IStringOptionsInterface {\n\tchosen_letter: 'a' | 'b' | 'c';\n}\n";
+        chai_1.expect(input).to.equal(output);
+    });
     it("should convert mongoose 'type: Number' to TypeScript type 'number'", function () {
         var input = generateInterface("AgeNumberInterface", {
             age: {

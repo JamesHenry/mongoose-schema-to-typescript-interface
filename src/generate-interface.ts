@@ -52,6 +52,36 @@ function isNestedSchemaType(fieldConfig: any): boolean {
 }
 
 /**
+ * Return true if the given mongoose field config has enum values
+ * @private
+ */
+function hasEnumValues(fieldConfig: any): boolean {
+	return fieldConfig.enum && fieldConfig.enum.length
+}
+
+/**
+ * Convert an array of strings into a stringified TypeScript string literal type
+ * @private
+ */
+function generateStringLiteralTypeFromEnum(enumOptions: string[]): string {
+
+	let stringLiteralStr = ``
+
+	enumOptions.forEach(( option, index ) => {
+
+		stringLiteralStr += `'${option}'`
+
+		if (index !== enumOptions.length - 1) {
+			stringLiteralStr += ` | `
+		}
+
+	})
+
+	return stringLiteralStr
+
+}
+
+/**
  * For a given mongoose schema type, return the relevant TypeScript type as a string
  * @private
  */
@@ -119,7 +149,13 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): st
 
 		}
 
-		return getTypeScriptTypeFromMongooseType(fieldConfig.type)
+		const typeString = getTypeScriptTypeFromMongooseType(fieldConfig.type)
+
+		if (typeString === TYPESCRIPT_TYPES.STRING && hasEnumValues(fieldConfig)) {
+			return generateStringLiteralTypeFromEnum(fieldConfig.enum)
+		}
+
+		return typeString
 
 	}
 
