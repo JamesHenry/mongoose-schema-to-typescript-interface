@@ -352,4 +352,27 @@ interface IMainInterface {
 
 	})
 
+	it(`should support multiple schema fields on newlines`, () => {
+
+		const input = generateInterface(`MultipleFieldsInterface`, {
+			field1: {
+				type: String,
+				required: true,
+			},
+			field2: {
+				type: String,
+				required: true,
+			},
+		})
+
+		const output = `interface IMultipleFieldsInterface {
+	field1: string;
+	field2: string;
+}
+`
+
+		expect(input).to.equal(output)
+
+	})
+
 })

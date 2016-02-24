@@ -182,9 +182,7 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): st
 
 			interfaceString += ';'
 
-			if (index === fields.length - 1) {
-				interfaceString = appendNewline(interfaceString)
-			}
+			interfaceString = appendNewline(interfaceString)
 
 		})
 
