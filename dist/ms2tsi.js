@@ -18,7 +18,7 @@ program
         var data = require(path.join(__dirname, "../" + schemaFile));
         output += generate_interface_1.default(data.name, data.schema);
     });
-    fs.writeFile(path.join(__dirname, "../" + outputDir + "/" + moduleName + ".d.ts"), output, function () { });
+    fs.writeFile(path.join(__dirname, "../" + outputDir + "/" + moduleName + ".d.ts"), output);
 });
 program.parse(process.argv);
 //# sourceMappingURL=ms2tsi.js.map

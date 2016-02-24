@@ -25,7 +25,7 @@ program
 
 		})
 
-		fs.writeFile( path.join( __dirname, `../${outputDir}/${moduleName}.d.ts`), output, () => {})
+		fs.writeFile( path.join( __dirname, `../${outputDir}/${moduleName}.d.ts`), output)
 
 	})
 
