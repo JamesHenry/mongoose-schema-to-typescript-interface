@@ -1,5 +1,4 @@
 "use strict";
-var mongoose_1 = require('mongoose');
 var utilities_1 = require('./utilities');
 var camelCase = require('lodash.camelcase');
 var upperFirst = require('lodash.upperfirst');
@@ -45,11 +44,11 @@ function generateStringLiteralTypeFromEnum(enumOptions) {
 function getTypeScriptTypeFromMongooseType(mongooseType) {
     switch (true) {
         case mongooseType === String:
-        case mongooseType === mongoose_1.Schema.Types.ObjectId:
+        case mongooseType.schemaName && mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
             return utilities_1.TYPESCRIPT_TYPES.STRING;
         case mongooseType === Number:
             return utilities_1.TYPESCRIPT_TYPES.NUMBER;
-        case mongooseType === mongoose_1.Schema.Types.Mixed:
+        case mongooseType.schemaName && mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.MIXED:
             return utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL;
         case mongooseType === Date:
             return utilities_1.TYPESCRIPT_TYPES.DATE;

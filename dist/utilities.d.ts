@@ -14,6 +14,10 @@ export declare const TYPESCRIPT_TYPES: {
     ARRAY_THEREOF: string;
     OPTIONAL_PROP: string;
 };
+export declare const MONGOOSE_SCHEMA_TYPES: {
+    OBJECT_ID: string;
+    MIXED: string;
+};
 /**
  * Append the newline character to a given string
  */

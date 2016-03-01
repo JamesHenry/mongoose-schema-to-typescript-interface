@@ -14,6 +14,10 @@ export const TYPESCRIPT_TYPES = {
 	ARRAY_THEREOF: '[]',
 	OPTIONAL_PROP: '?',
 }
+export const MONGOOSE_SCHEMA_TYPES = {
+	OBJECT_ID: 'ObjectId',
+	MIXED: 'Mixed',
+}
 
 /**
  * Append the newline character to a given string

@@ -1,7 +1,6 @@
-import { Schema } from 'mongoose'
-
 import {
 	TYPESCRIPT_TYPES,
+	MONGOOSE_SCHEMA_TYPES,
 	INTERFACE_PREFIX,
 	appendNewline,
 	indent,
@@ -42,7 +41,7 @@ function generateStringLiteralTypeFromEnum(enumOptions: string[]): string {
 
 	let stringLiteralStr = ``
 
-	enumOptions.forEach(( option, index ) => {
+	enumOptions.forEach((option, index) => {
 
 		stringLiteralStr += `'${option}'`
 
@@ -64,34 +63,34 @@ function getTypeScriptTypeFromMongooseType(mongooseType: any): string {
 
 	switch (true) {
 
-	case mongooseType === String:
-	case mongooseType === Schema.Types.ObjectId:
-		return TYPESCRIPT_TYPES.STRING
+		case mongooseType === String:
+		case mongooseType.schemaName && mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
+			return TYPESCRIPT_TYPES.STRING
 
-	case mongooseType === Number:
-		return TYPESCRIPT_TYPES.NUMBER
+		case mongooseType === Number:
+			return TYPESCRIPT_TYPES.NUMBER
 
-	case mongooseType === Schema.Types.Mixed:
-		return TYPESCRIPT_TYPES.OBJECT_LITERAL
+		case mongooseType.schemaName && mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.MIXED:
+			return TYPESCRIPT_TYPES.OBJECT_LITERAL
 
-	case mongooseType === Date:
-		return TYPESCRIPT_TYPES.DATE
+		case mongooseType === Date:
+			return TYPESCRIPT_TYPES.DATE
 
-	case mongooseType === Boolean:
-		return TYPESCRIPT_TYPES.BOOLEAN
+		case mongooseType === Boolean:
+			return TYPESCRIPT_TYPES.BOOLEAN
 
-	case Array.isArray(mongooseType) === true:
+		case Array.isArray(mongooseType) === true:
 
-		if (!mongooseType.length) {
-			return `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
-		}
+			if (!mongooseType.length) {
+				return `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+			}
 
-		const arrayOfType = mongooseType[0]
+			const arrayOfType = mongooseType[0]
 
-		return `${getTypeScriptTypeFromMongooseType(arrayOfType)}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+			return `${getTypeScriptTypeFromMongooseType(arrayOfType)}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
 
-	default:
-		throw new Error(`Mongoose type not recognised/supported: ${mongooseType}`)
+		default:
+			throw new Error(`Mongoose type not recognised/supported: ${mongooseType}`)
 
 	}
 
@@ -139,7 +138,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 		const fields = Object.keys(fromSchema)
 		let interfaceString = `interface ${INTERFACE_PREFIX}${name} {`
 
-		if ( fields.length ) {
+		if (fields.length) {
 			interfaceString = appendNewline(interfaceString)
 		}
 

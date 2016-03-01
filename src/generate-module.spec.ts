@@ -1,4 +1,3 @@
-import { Schema }     from 'mongoose'
 import { expect }     from 'chai'
 import generateModule from './generate-module'
 

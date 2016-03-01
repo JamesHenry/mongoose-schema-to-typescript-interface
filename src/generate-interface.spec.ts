@@ -91,7 +91,7 @@ describe(`generateInterface`, () => {
 		const input = generateInterface(`StringOptionsInterface`, {
 			chosen_letter: {
 				type: String,
-				enum: [ 'a', 'b', 'c' ],
+				enum: ['a', 'b', 'c'],
 				required: true,
 			},
 		})

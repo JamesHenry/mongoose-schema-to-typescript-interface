@@ -15,6 +15,10 @@ exports.TYPESCRIPT_TYPES = {
     ARRAY_THEREOF: '[]',
     OPTIONAL_PROP: '?',
 };
+exports.MONGOOSE_SCHEMA_TYPES = {
+    OBJECT_ID: 'ObjectId',
+    MIXED: 'Mixed',
+};
 /**
  * Append the newline character to a given string
  */
