@@ -14,13 +14,14 @@ program.on('--help', function () {
 program
     .command('* <output-dir> <module-name> <schemas-glob...>')
     .action(function (outputDir, moduleName, schemaFiles) {
+    var currentDir = process.env.PWD;
     var output = "";
     schemaFiles.forEach(function (schemaFile) {
-        var data = require(path.join(__dirname, "../" + schemaFile));
+        var data = require(path.resolve(currentDir, schemaFile));
         output += generate_interface_1.default(data.name, data.schema);
     });
     output = generate_module_1.default(moduleName, output);
-    fs.writeFile(path.join(__dirname, "../" + outputDir + "/" + moduleName + ".d.ts"), output);
+    fs.writeFile(path.resolve(currentDir, outputDir + "/" + moduleName + ".d.ts"), output);
 });
 program.parse(process.argv);
 //# sourceMappingURL=ms2tsi.js.map

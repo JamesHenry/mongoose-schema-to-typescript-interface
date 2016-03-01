@@ -17,11 +17,12 @@ program
 	.command('* <output-dir> <module-name> <schemas-glob...>')
 	.action((outputDir: string, moduleName: string, schemaFiles: string[]) => {
 
+		const currentDir = process.env.PWD
 		let output = ``
 
 		schemaFiles.forEach((schemaFile) => {
 
-			const data = require(path.join( __dirname, `../${schemaFile}`))
+			const data = require(path.resolve(currentDir, schemaFile))
 
 			output += generateInterface(data.name, data.schema)
 
@@ -29,7 +30,7 @@ program
 
 		output = generateModule(moduleName, output)
 
-		fs.writeFile( path.join( __dirname, `../${outputDir}/${moduleName}.d.ts`), output)
+		fs.writeFile(path.resolve(currentDir, `${outputDir}/${moduleName}.d.ts`), output)
 
 	})
 
