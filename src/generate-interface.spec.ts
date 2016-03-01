@@ -1,7 +1,6 @@
-import { Schema } from 'mongoose'
-import { expect } from 'chai'
-
-const generateInterface = require(`./generate-interface.js`).default
+import { Schema }        from 'mongoose'
+import { expect }        from 'chai'
+import generateInterface from './generate-interface'
 
 describe(`generateInterface`, () => {
 

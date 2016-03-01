@@ -5,13 +5,14 @@
   "main": "./dist/generate-interface.js",
   "scripts": {
     "commit": "./node_modules/.bin/git-cz",
-    "test": "./node_modules/.bin/tsc --outDir ./dist/ && ./node_modules/.bin/mocha ./dist/*.spec.js -w",
-    "test:single": "./node_modules/.bin/tsc --outDir ./dist/ && ./node_modules/.bin/mocha ./dist/*.spec.js",
+    "test": "npm run build:single && ./node_modules/.bin/mocha ./dist/*.spec.js -w",
+    "test:single": "npm run build:single && ./node_modules/.bin/mocha ./dist/*.spec.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "typings-install": "./node_modules/.bin/typings install",
-    "postinstall": "npm run typings-install",
     "lint": "./node_modules/.bin/tslint ./src/**/*.ts",
-    "prepublish": "./node_modules/.bin/tsc --outDir ./dist/"
+    "build": "./node_modules/.bin/tsc -w --outDir ./dist/",
+    "build:single": "./node_modules/.bin/tsc --outDir ./dist/",
+    "prepublish": "npm run build:single"
   },
   "repository": {
     "type": "git",
@@ -49,7 +50,11 @@
       "pre-commit": "npm run lint"
     }
   },
+  "bin": {
+  	"ms2tsi": "bin/ms2tsi.js"
+  },
   "dependencies": {
+    "commander": "2.9.0",
     "lodash.camelcase": "4.1.0",
     "lodash.upperfirst": "4.1.1",
     "mongoose": "4.4.4"

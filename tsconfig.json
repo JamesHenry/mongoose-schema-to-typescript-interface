@@ -3,12 +3,14 @@
 		"noImplicitAny": true,
 		"module": "commonjs",
 		"target": "ES5",
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
 		"sourceMap": true,
 		"declaration": true
 	},
 	"files": [
+		"./src/ms2tsi.ts",
+		"./src/utilities.ts",
+		"./src/generate-module.ts",
+		"./src/generate-module.spec.ts",
 		"./src/generate-interface.ts",
 		"./src/generate-interface.spec.ts",
 		"./typings/main.d.ts"
