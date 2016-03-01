@@ -1,7 +1,9 @@
+import * as program      from 'commander'
+import * as fs           from 'fs'
+import * as path         from 'path'
+
+import generateModule    from './generate-module'
 import generateInterface from './generate-interface'
-import * as program from 'commander'
-import * as fs from 'fs'
-import * as path from 'path'
 
 program.on('--help', () => {
 	console.log('  Examples:')
@@ -24,6 +26,8 @@ program
 			output += generateInterface(data.name, data.schema)
 
 		})
+
+		output = generateModule(moduleName, output)
 
 		fs.writeFile( path.join( __dirname, `../${outputDir}/${moduleName}.d.ts`), output)
 

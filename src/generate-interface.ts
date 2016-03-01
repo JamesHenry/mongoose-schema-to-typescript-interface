@@ -1,39 +1,14 @@
 import { Schema } from 'mongoose'
+
+import {
+	TYPESCRIPT_TYPES,
+	INTERFACE_PREFIX,
+	appendNewline,
+	indent,
+} from './utilities'
+
 const camelCase = require('lodash.camelcase')
 const upperFirst = require('lodash.upperfirst')
-
-/**
- * Internal constants
- */
-const INDENT_CHAR = '\t'
-const NEWLINE_CHAR = '\n'
-const INTERFACE_PREFIX = 'I'
-const TYPESCRIPT_TYPES = {
-	STRING: 'string',
-	NUMBER: 'number',
-	BOOLEAN: 'boolean',
-	DATE: 'Date',
-	OBJECT_LITERAL: '{}',
-	ANY: 'any',
-	ARRAY_THEREOF: '[]',
-	OPTIONAL_PROP: '?',
-}
-
-/**
- * Prepend a given string with the indentation character
- * @private
- */
-function indent(str: string): string {
-	return `${INDENT_CHAR}${str}`
-}
-
-/**
- * Append the newline character to a given string
- * @private
- */
-function appendNewline(str: string): string {
-	return `${str}${NEWLINE_CHAR}`
-}
 
 /**
  * Format a given nested interface name
@@ -127,7 +102,7 @@ function getTypeScriptTypeFromMongooseType(mongooseType: any): string {
  * and any requisite nested interfaces
  * @public
  */
-function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string {
+export default function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string {
 
 	let generatedContent = ''
 
@@ -199,5 +174,3 @@ function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): st
 	return generatedContent
 
 }
-
-export default typescriptInterfaceGenerator

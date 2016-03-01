@@ -3,5 +3,4 @@
  * and any requisite nested interfaces
  * @public
  */
-declare function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string;
-export default typescriptInterfaceGenerator;
+export default function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string;
