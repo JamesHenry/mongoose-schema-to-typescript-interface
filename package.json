@@ -9,7 +9,6 @@
     "test:single": "npm run build:single && ./node_modules/.bin/mocha ./dist/*.spec.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "typings-install": "./node_modules/.bin/typings install",
-    "postinstall": "npm run typings-install",
     "lint": "./node_modules/.bin/tslint ./src/**/*.ts",
     "build": "./node_modules/.bin/tsc -w --outDir ./dist/",
     "build:single": "./node_modules/.bin/tsc --outDir ./dist/",
