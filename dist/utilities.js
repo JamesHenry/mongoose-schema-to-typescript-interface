@@ -1,4 +1,6 @@
 "use strict";
+var generate_module_1 = require('./generate-module');
+var generate_interface_1 = require('./generate-interface');
 /**
  * Library constants
  */
@@ -53,4 +55,19 @@ function indentEachLine(content) {
         .join(exports.NEWLINE_CHAR);
 }
 exports.indentEachLine = indentEachLine;
+function generateOutput(moduleName, currentDir, schemaFiles) {
+    var output = "";
+    for (var _i = 0, schemaFiles_1 = schemaFiles; _i < schemaFiles_1.length; _i++) {
+        var schemaFile = schemaFiles_1[_i];
+        var interfaceName = schemaFile.name;
+        var schemaTree = schemaFile.schema;
+        if (!interfaceName) {
+            throw new Error("Schema file does not export a 'name': " + schemaFile);
+        }
+        output += generate_interface_1.default(interfaceName, schemaTree);
+    }
+    output = generate_module_1.default(moduleName, output);
+    return output;
+}
+exports.generateOutput = generateOutput;
 //# sourceMappingURL=utilities.js.map

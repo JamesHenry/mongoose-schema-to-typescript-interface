@@ -1,3 +1,8 @@
+import * as path from 'path'
+
+import generateModule     from './generate-module'
+import generateInterface  from './generate-interface'
+
 /**
  * Library constants
  */
@@ -55,4 +60,27 @@ export function indentEachLine(content: string): string {
 
 		})
 		.join(NEWLINE_CHAR)
+}
+
+export function generateOutput(moduleName: string, currentDir: string, schemaFiles: any[]): string {
+
+	let output = ``
+
+	for (const schemaFile of schemaFiles) {
+
+		const interfaceName = schemaFile.name
+		const schemaTree = schemaFile.schema
+
+		if (!interfaceName) {
+			throw new Error(`Schema file does not export a 'name': ${schemaFile}`)
+		}
+
+		output += generateInterface(interfaceName, schemaTree)
+
+	}
+
+	output = generateModule(moduleName, output)
+
+	return output
+
 }
