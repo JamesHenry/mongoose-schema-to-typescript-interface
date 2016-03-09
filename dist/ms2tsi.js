@@ -3,6 +3,10 @@ var program = require('commander');
 var fs = require('fs');
 var path = require('path');
 var utilities_1 = require('./utilities');
+/**
+ * Use Babel to transpile schema files
+ */
+require('babel-register');
 program.on('--help', function () {
     console.log('  Examples:');
     console.log('');

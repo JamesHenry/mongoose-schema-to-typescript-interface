@@ -4,6 +4,11 @@ import * as path    from 'path'
 
 import { generateOutput } from './utilities'
 
+/**
+ * Use Babel to transpile schema files
+ */
+import 'babel-register'
+
 program.on('--help', () => {
 	console.log('  Examples:')
 	console.log('')
