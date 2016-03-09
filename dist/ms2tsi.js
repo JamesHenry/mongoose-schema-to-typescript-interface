@@ -29,7 +29,18 @@ program
         return process.exit(1);
     }
     var currentDir = process.env.PWD;
-    var resolvedSchemaFiles = schemas.map(function (schemaFile) { return require(path.resolve(currentDir, schemaFile)); });
+    var resolvedSchemaFiles = schemas.map(function (schemaPath) {
+        var schemaFile = require(path.resolve(currentDir, schemaPath));
+        /**
+         * Allow for vanilla objects or full mongoose.Schema instances to
+         * have been exported by normalising the exported `schema` property
+         */
+        if (schemaFile.schema && schemaFile.schema.tree) {
+            schemaFile.schema = schemaFile.schema.tree;
+            return schemaFile;
+        }
+        return schemaFile;
+    });
     var output = utilities_1.generateOutput(moduleName, currentDir, resolvedSchemaFiles);
     fs.writeFile(path.resolve(currentDir, outputDir + "/" + moduleName + ".d.ts"), output);
 });

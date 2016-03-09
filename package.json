@@ -5,13 +5,13 @@
   "main": "./dist/generate-interface.js",
   "scripts": {
     "commit": "./node_modules/.bin/git-cz",
-    "test": "npm run build:single && ./node_modules/.bin/mocha ./dist/*.spec.js -w",
-    "test:single": "npm run build:single && ./node_modules/.bin/mocha ./dist/*.spec.js",
+    "test": "npm run build:single && ./node_modules/.bin/mocha ./dist/test/*.spec.js -w",
+    "test:single": "npm run build:single && ./node_modules/.bin/mocha ./dist/test/*.spec.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "typings-install": "./node_modules/.bin/typings install",
     "lint": "./node_modules/.bin/tslint ./src/**/*.ts",
-    "build": "./node_modules/.bin/tsc -w --outDir ./dist/",
-    "build:single": "./node_modules/.bin/tsc --outDir ./dist/",
+    "build": "./node_modules/.bin/tsc -w --outDir ./dist",
+    "build:single": "./node_modules/.bin/tsc --outDir ./dist",
     "prepublish": "npm run build:single"
   },
   "repository": {

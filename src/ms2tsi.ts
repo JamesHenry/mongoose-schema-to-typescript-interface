@@ -1,6 +1,6 @@
-import * as program      from 'commander'
-import * as fs           from 'fs'
-import * as path         from 'path'
+import * as program from 'commander'
+import * as fs      from 'fs'
+import * as path    from 'path'
 
 import { generateOutput } from './utilities'
 
@@ -36,7 +36,23 @@ program
 		}
 
 		const currentDir = process.env.PWD
-		const resolvedSchemaFiles = schemas.map((schemaFile: any) => require(path.resolve(currentDir, schemaFile)))
+		const resolvedSchemaFiles = schemas.map((schemaPath: string) => {
+
+			const schemaFile = require(path.resolve(currentDir, schemaPath))
+
+			/**
+			 * Allow for vanilla objects or full mongoose.Schema instances to
+			 * have been exported by normalising the exported `schema` property
+			 */
+			if (schemaFile.schema && schemaFile.schema.tree) {
+				schemaFile.schema = schemaFile.schema.tree
+				return schemaFile
+			}
+
+			return schemaFile
+
+		})
+
 		const output = generateOutput(moduleName, currentDir, resolvedSchemaFiles)
 
 		fs.writeFile(path.resolve(currentDir, `${outputDir}/${moduleName}.d.ts`), output)

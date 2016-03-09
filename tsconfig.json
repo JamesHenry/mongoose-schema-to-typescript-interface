@@ -9,11 +9,11 @@
 	"files": [
 		"./src/ms2tsi.ts",
 		"./src/utilities.ts",
-		"./src/utilities.spec.ts",
+		"./src/test/utilities.spec.ts",
 		"./src/generate-module.ts",
-		"./src/generate-module.spec.ts",
+		"./src/test/generate-module.spec.ts",
 		"./src/generate-interface.ts",
-		"./src/generate-interface.spec.ts",
+		"./src/test/generate-interface.spec.ts",
 		"./typings/main.d.ts"
 	],
 	"exclude": [

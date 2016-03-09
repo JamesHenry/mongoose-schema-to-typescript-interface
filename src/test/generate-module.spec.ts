@@ -1,5 +1,5 @@
 import { expect }     from 'chai'
-import generateModule from './generate-module'
+import generateModule from '../generate-module'
 
 describe(`generateModule`, () => {
 

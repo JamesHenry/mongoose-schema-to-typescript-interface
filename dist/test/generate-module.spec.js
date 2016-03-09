@@ -1,6 +1,6 @@
 "use strict";
 var chai_1 = require('chai');
-var generate_module_1 = require('./generate-module');
+var generate_module_1 = require('../generate-module');
 describe("generateModule", function () {
     it("should return a stringified TypeScript module", function () {
         var input = generate_module_1.default("ModuleName", '');

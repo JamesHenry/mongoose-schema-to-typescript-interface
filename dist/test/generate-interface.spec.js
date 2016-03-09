@@ -1,7 +1,7 @@
 "use strict";
 var mongoose_1 = require('mongoose');
 var chai_1 = require('chai');
-var generate_interface_1 = require('./generate-interface');
+var generate_interface_1 = require('../generate-interface');
 describe("generateInterface", function () {
     it("should return a stringified TypeScript interface", function () {
         var input = generate_interface_1.default("EmptyInterface", {});

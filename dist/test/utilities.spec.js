@@ -1,6 +1,6 @@
 "use strict";
 var chai_1 = require('chai');
-var utilities_1 = require('./utilities');
+var utilities_1 = require('../utilities');
 describe('utilities', function () {
     describe('appendNewline', function () {
         it('should append a newline character to the given string', function () {

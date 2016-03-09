@@ -1,3 +1,5 @@
+import { VirtualType } from 'mongoose'
+
 import {
 	TYPESCRIPT_TYPES,
 	MONGOOSE_SCHEMA_TYPES,
@@ -23,6 +25,14 @@ function formatNestedInterfaceName(name: string): string {
  */
 function isNestedSchemaType(fieldConfig: any): boolean {
 	return !fieldConfig.type && Object.keys(fieldConfig).length > 0
+}
+
+/**
+ * Return true if the given mongoose field config is an instance of VirtualType
+ * @private
+ */
+function isVirtualType(fieldConfig: any): boolean {
+	return fieldConfig instanceof VirtualType
 }
 
 /**
@@ -97,6 +107,14 @@ function getTypeScriptTypeFromMongooseType(mongooseType: any): string {
 }
 
 /**
+ * Predicate function to filter out invalid fields from a schema object
+ * @private
+ */
+function filterOutInvalidFields(fieldName: string) {
+	return fieldName !== '0' && fieldName !== '1'
+}
+
+/**
  * For the `rawSchema`, generate a TypeScript interface under the given `interfaceName`,
  * and any requisite nested interfaces
  * @public
@@ -106,8 +124,6 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 	let generatedContent = ''
 
 	function generateFieldTypeString(fieldName: string, fieldConfig: any) {
-
-		let interfaceString = ''
 
 		/**
 		 * Create nested interfaces, if applicable
@@ -135,7 +151,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 
 	function generateInterface(name: string, fromSchema: any) {
 
-		const fields = Object.keys(fromSchema)
+		const fields = Object.keys(fromSchema).filter(filterOutInvalidFields)
 		let interfaceString = `interface ${INTERFACE_PREFIX}${name} {`
 
 		if (fields.length) {
@@ -145,6 +161,11 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 		fields.forEach((fieldName, index) => {
 
 			const fieldConfig = fromSchema[fieldName]
+
+			// VirtualType fields are not supported yet
+			if (isVirtualType(fieldConfig)) {
+				return null
+			}
 
 			interfaceString += indent(fieldName)
 

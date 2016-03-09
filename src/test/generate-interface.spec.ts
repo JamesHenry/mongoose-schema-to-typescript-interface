@@ -1,6 +1,6 @@
 import { Schema }        from 'mongoose'
 import { expect }        from 'chai'
-import generateInterface from './generate-interface'
+import generateInterface from '../generate-interface'
 
 describe(`generateInterface`, () => {
 

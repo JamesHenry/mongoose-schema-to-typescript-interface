@@ -5,7 +5,7 @@ import {
 	appendNewline,
 	indent,
 	indentEachLine
-} from './utilities'
+} from '../utilities'
 
 describe('utilities', () => {
 
