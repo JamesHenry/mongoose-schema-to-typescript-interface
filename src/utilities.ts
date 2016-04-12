@@ -13,11 +13,14 @@ export const TYPESCRIPT_TYPES = {
 	STRING: 'string',
 	NUMBER: 'number',
 	BOOLEAN: 'boolean',
+	ARRAY: 'Array',
 	DATE: 'Date',
 	OBJECT_LITERAL: '{}',
 	ANY: 'any',
 	ARRAY_THEREOF: '[]',
 	OPTIONAL_PROP: '?',
+	UNSUPPORTED: 'Unsupported',
+	SCHEMA: 'SCHEMA',
 }
 export const MONGOOSE_SCHEMA_TYPES = {
 	OBJECT_ID: 'ObjectId',

@@ -207,5 +207,20 @@ describe("generateInterface", function () {
         var output = "interface IMultipleFieldsInterface {\n\tfield1: string;\n\tfield2: string;\n}\n";
         chai_1.expect(input).to.equal(output);
     });
+    it("should support arrays of nested schemas as a field type", function () {
+        var nested = {
+            stuff: {
+                type: String,
+                required: false,
+            }
+        };
+        var input = generate_interface_1.default("MainInterface", {
+            multipleNested: {
+                type: [nested],
+            },
+        });
+        var output = "interface IMultipleNested {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tmultipleNested: IMultipleNested[];\n}\n";
+        chai_1.expect(input).to.equal(output);
+    });
 });
 //# sourceMappingURL=generate-interface.spec.js.map

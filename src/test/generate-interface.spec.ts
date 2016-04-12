@@ -374,4 +374,32 @@ interface IMainInterface {
 
 	})
 
+	it(`should support arrays of nested schemas as a field type`, () => {
+
+		const nested = {
+			stuff: {
+				type: String,
+				required: false,
+			}
+		}
+
+		const input = generateInterface(`MainInterface`, {
+			multipleNested: {
+				type: [nested],
+			},
+		})
+
+		const output = `interface IMultipleNested {
+	stuff?: string;
+}
+
+interface IMainInterface {
+	multipleNested: IMultipleNested[];
+}
+`
+
+		expect(input).to.equal(output)
+
+	})
+
 })

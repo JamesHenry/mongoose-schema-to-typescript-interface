@@ -11,11 +11,14 @@ exports.TYPESCRIPT_TYPES = {
     STRING: 'string',
     NUMBER: 'number',
     BOOLEAN: 'boolean',
+    ARRAY: 'Array',
     DATE: 'Date',
     OBJECT_LITERAL: '{}',
     ANY: 'any',
     ARRAY_THEREOF: '[]',
     OPTIONAL_PROP: '?',
+    UNSUPPORTED: 'Unsupported',
+    SCHEMA: 'SCHEMA',
 };
 exports.MONGOOSE_SCHEMA_TYPES = {
     OBJECT_ID: 'ObjectId',

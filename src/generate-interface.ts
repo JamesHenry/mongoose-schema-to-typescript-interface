@@ -27,6 +27,10 @@ function isNestedSchemaType(fieldConfig: any): boolean {
 	return !fieldConfig.type && Object.keys(fieldConfig).length > 0
 }
 
+function isNestedSchemaArrayType(fieldConfig: any): boolean {
+	return Array.isArray(fieldConfig.type) && fieldConfig.type.every((nestedConfig: any) => isNestedSchemaType(nestedConfig))
+}
+
 /**
  * Return true if the given mongoose field config is an instance of VirtualType
  * @private
@@ -66,21 +70,23 @@ function generateStringLiteralTypeFromEnum(enumOptions: string[]): string {
 }
 
 /**
- * For a given mongoose schema type, return the relevant TypeScript type as a string
+ * Return a string representing the deterimed TypeScript type, if supported,
+ * otherwise return the value of TYPESCRIPT_TYPES.UNSUPPORTED
  * @private
  */
-function getTypeScriptTypeFromMongooseType(mongooseType: any): string {
+function determineSupportedType(mongooseType: any): string {
 
 	switch (true) {
 
 		case mongooseType === String:
-		case mongooseType.schemaName && mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
+		case mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
+		case mongooseType.name === MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
 			return TYPESCRIPT_TYPES.STRING
 
 		case mongooseType === Number:
 			return TYPESCRIPT_TYPES.NUMBER
 
-		case mongooseType.schemaName && mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.MIXED:
+		case mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.MIXED:
 			return TYPESCRIPT_TYPES.OBJECT_LITERAL
 
 		case mongooseType === Date:
@@ -90,17 +96,13 @@ function getTypeScriptTypeFromMongooseType(mongooseType: any): string {
 			return TYPESCRIPT_TYPES.BOOLEAN
 
 		case Array.isArray(mongooseType) === true:
+			return TYPESCRIPT_TYPES.ARRAY
 
-			if (!mongooseType.length) {
-				return `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
-			}
-
-			const arrayOfType = mongooseType[0]
-
-			return `${getTypeScriptTypeFromMongooseType(arrayOfType)}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+		case typeof mongooseType === 'object' && Object.keys(mongooseType).length > 0:
+			return TYPESCRIPT_TYPES.SCHEMA
 
 		default:
-			throw new Error(`Mongoose type not recognised/supported: ${mongooseType}`)
+			return TYPESCRIPT_TYPES.UNSUPPORTED
 
 	}
 
@@ -115,6 +117,36 @@ function filterOutInvalidFields(fieldName: string) {
 }
 
 /**
+ * Generate a field value (type definition) for a particular TypeScript interface
+ * @private
+ */
+function generateInterfaceFieldValue(supportedType: string, fieldConfig: any) {
+
+	switch (supportedType) {
+
+		/**
+		 * Single values
+		 */
+		case TYPESCRIPT_TYPES.NUMBER:
+		case TYPESCRIPT_TYPES.OBJECT_LITERAL:
+		case TYPESCRIPT_TYPES.DATE:
+		case TYPESCRIPT_TYPES.BOOLEAN:
+			return supportedType
+
+		/**
+		 * Strings and string literals
+		 */
+		case TYPESCRIPT_TYPES.STRING:
+			if (hasEnumValues(fieldConfig)) {
+				return generateStringLiteralTypeFromEnum(fieldConfig.enum)
+			}
+			return supportedType
+
+	}
+
+}
+
+/**
  * For the `rawSchema`, generate a TypeScript interface under the given `interfaceName`,
  * and any requisite nested interfaces
  * @public
@@ -122,32 +154,6 @@ function filterOutInvalidFields(fieldName: string) {
 export default function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string {
 
 	let generatedContent = ''
-
-	function generateFieldTypeString(fieldName: string, fieldConfig: any) {
-
-		/**
-		 * Create nested interfaces, if applicable
-		 */
-		if (isNestedSchemaType(fieldConfig)) {
-
-			const nestedInterfaceName = formatNestedInterfaceName(fieldName)
-			const nestedInterface = generateInterface(nestedInterfaceName, fieldConfig)
-
-			generatedContent += appendNewline(nestedInterface)
-
-			return `${INTERFACE_PREFIX}${nestedInterfaceName}`
-
-		}
-
-		const typeString = getTypeScriptTypeFromMongooseType(fieldConfig.type)
-
-		if (typeString === TYPESCRIPT_TYPES.STRING && hasEnumValues(fieldConfig)) {
-			return generateStringLiteralTypeFromEnum(fieldConfig.enum)
-		}
-
-		return typeString
-
-	}
 
 	function generateInterface(name: string, fromSchema: any) {
 
@@ -169,11 +175,108 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 
 			interfaceString += indent(fieldName)
 
-			if (!isNestedSchemaType(fieldConfig) && !fieldConfig.required) {
+			let supportedType: string
+
+			if (isNestedSchemaType(fieldConfig)) {
+				supportedType = TYPESCRIPT_TYPES.OBJECT_LITERAL
+			} else {
+				supportedType = determineSupportedType(fieldConfig.type)
+			}
+
+			/**
+			 * Unsupported type
+			 */
+			if (supportedType === TYPESCRIPT_TYPES.UNSUPPORTED) {
+				throw new Error(`Mongoose type not recognised/supported: ${JSON.stringify(fieldConfig)}`)
+			}
+
+			let interfaceVal: string = ''
+
+			/**
+			 * Nested schema type
+			 */
+			if (supportedType === TYPESCRIPT_TYPES.OBJECT_LITERAL) {
+
+				if (fieldConfig.type && fieldConfig.type.schemaName === MONGOOSE_SCHEMA_TYPES.MIXED) {
+
+					interfaceVal = '{}'
+
+				} else {
+
+					const nestedInterfaceName = formatNestedInterfaceName(fieldName)
+					const nestedInterface = generateInterface(nestedInterfaceName, fieldConfig)
+
+					generatedContent += appendNewline(nestedInterface)
+
+					interfaceVal = INTERFACE_PREFIX + nestedInterfaceName
+
+				}
+
+			} else if (supportedType === TYPESCRIPT_TYPES.ARRAY) {
+
+				/**
+				 * Empty array
+				 */
+				if (!fieldConfig.type.length) {
+
+					interfaceVal = `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+
+				} else if (isNestedSchemaArrayType(fieldConfig)) {
+
+					const nestedSupportedType = determineSupportedType(fieldConfig.type[0])
+					if (nestedSupportedType === TYPESCRIPT_TYPES.UNSUPPORTED) {
+						throw new Error(`Mongoose type not recognised/supported: ${JSON.stringify(fieldConfig)}`)
+					}
+
+					/**
+					 * Nested ObjectId or Mixed types
+					 */
+					if (nestedSupportedType === TYPESCRIPT_TYPES.OBJECT_LITERAL || nestedSupportedType === TYPESCRIPT_TYPES.STRING) {
+
+						interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + TYPESCRIPT_TYPES.ARRAY_THEREOF
+
+					} else {
+
+						/**
+						 * Array of nested schema types
+						 */
+						const nestedInterfaceName = formatNestedInterfaceName(fieldName)
+						const nestedInterface = generateInterface(nestedInterfaceName, fieldConfig.type[0])
+
+						generatedContent += appendNewline(nestedInterface)
+
+						interfaceVal = INTERFACE_PREFIX + nestedInterfaceName + TYPESCRIPT_TYPES.ARRAY_THEREOF
+
+					}
+
+				} else {
+
+					/**
+					 * Array of single value types
+					 */
+					const nestedSupportedType = determineSupportedType(fieldConfig.type[0])
+					if (nestedSupportedType === TYPESCRIPT_TYPES.UNSUPPORTED) {
+						throw new Error(`Mongoose type not recognised/supported: ${JSON.stringify(fieldConfig)}`)
+					}
+
+					interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + TYPESCRIPT_TYPES.ARRAY_THEREOF
+
+				}
+
+			} else {
+
+				/**
+				 * Single value types
+				 */
+				interfaceVal = generateInterfaceFieldValue(supportedType, fieldConfig)
+
+			}
+
+			if (!isNestedSchemaType(fieldConfig) && !isNestedSchemaArrayType(fieldConfig) && !fieldConfig.required) {
 				interfaceString += TYPESCRIPT_TYPES.OPTIONAL_PROP
 			}
 
-			interfaceString += ': ' + generateFieldTypeString(fieldName, fieldConfig)
+			interfaceString += `: ${interfaceVal}`
 
 			interfaceString += ';'
 

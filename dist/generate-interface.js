@@ -17,6 +17,9 @@ function formatNestedInterfaceName(name) {
 function isNestedSchemaType(fieldConfig) {
     return !fieldConfig.type && Object.keys(fieldConfig).length > 0;
 }
+function isNestedSchemaArrayType(fieldConfig) {
+    return Array.isArray(fieldConfig.type) && fieldConfig.type.every(function (nestedConfig) { return isNestedSchemaType(nestedConfig); });
+}
 /**
  * Return true if the given mongoose field config is an instance of VirtualType
  * @private
@@ -46,30 +49,30 @@ function generateStringLiteralTypeFromEnum(enumOptions) {
     return stringLiteralStr;
 }
 /**
- * For a given mongoose schema type, return the relevant TypeScript type as a string
+ * Return a string representing the deterimed TypeScript type, if supported,
+ * otherwise return the value of TYPESCRIPT_TYPES.UNSUPPORTED
  * @private
  */
-function getTypeScriptTypeFromMongooseType(mongooseType) {
+function determineSupportedType(mongooseType) {
     switch (true) {
         case mongooseType === String:
-        case mongooseType.schemaName && mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
+        case mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
+        case mongooseType.name === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
             return utilities_1.TYPESCRIPT_TYPES.STRING;
         case mongooseType === Number:
             return utilities_1.TYPESCRIPT_TYPES.NUMBER;
-        case mongooseType.schemaName && mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.MIXED:
+        case mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.MIXED:
             return utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL;
         case mongooseType === Date:
             return utilities_1.TYPESCRIPT_TYPES.DATE;
         case mongooseType === Boolean:
             return utilities_1.TYPESCRIPT_TYPES.BOOLEAN;
         case Array.isArray(mongooseType) === true:
-            if (!mongooseType.length) {
-                return "" + utilities_1.TYPESCRIPT_TYPES.ANY + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
-            }
-            var arrayOfType = mongooseType[0];
-            return "" + getTypeScriptTypeFromMongooseType(arrayOfType) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+            return utilities_1.TYPESCRIPT_TYPES.ARRAY;
+        case typeof mongooseType === 'object' && Object.keys(mongooseType).length > 0:
+            return utilities_1.TYPESCRIPT_TYPES.SCHEMA;
         default:
-            throw new Error("Mongoose type not recognised/supported: " + mongooseType);
+            return utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED;
     }
 }
 /**
@@ -80,28 +83,36 @@ function filterOutInvalidFields(fieldName) {
     return fieldName !== '0' && fieldName !== '1';
 }
 /**
+ * Generate a field value (type definition) for a particular TypeScript interface
+ * @private
+ */
+function generateInterfaceFieldValue(supportedType, fieldConfig) {
+    switch (supportedType) {
+        /**
+         * Single values
+         */
+        case utilities_1.TYPESCRIPT_TYPES.NUMBER:
+        case utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL:
+        case utilities_1.TYPESCRIPT_TYPES.DATE:
+        case utilities_1.TYPESCRIPT_TYPES.BOOLEAN:
+            return supportedType;
+        /**
+         * Strings and string literals
+         */
+        case utilities_1.TYPESCRIPT_TYPES.STRING:
+            if (hasEnumValues(fieldConfig)) {
+                return generateStringLiteralTypeFromEnum(fieldConfig.enum);
+            }
+            return supportedType;
+    }
+}
+/**
  * For the `rawSchema`, generate a TypeScript interface under the given `interfaceName`,
  * and any requisite nested interfaces
  * @public
  */
 function typescriptInterfaceGenerator(interfaceName, rawSchema) {
     var generatedContent = '';
-    function generateFieldTypeString(fieldName, fieldConfig) {
-        /**
-         * Create nested interfaces, if applicable
-         */
-        if (isNestedSchemaType(fieldConfig)) {
-            var nestedInterfaceName = formatNestedInterfaceName(fieldName);
-            var nestedInterface = generateInterface(nestedInterfaceName, fieldConfig);
-            generatedContent += utilities_1.appendNewline(nestedInterface);
-            return "" + utilities_1.INTERFACE_PREFIX + nestedInterfaceName;
-        }
-        var typeString = getTypeScriptTypeFromMongooseType(fieldConfig.type);
-        if (typeString === utilities_1.TYPESCRIPT_TYPES.STRING && hasEnumValues(fieldConfig)) {
-            return generateStringLiteralTypeFromEnum(fieldConfig.enum);
-        }
-        return typeString;
-    }
     function generateInterface(name, fromSchema) {
         var fields = Object.keys(fromSchema).filter(filterOutInvalidFields);
         var interfaceString = "interface " + utilities_1.INTERFACE_PREFIX + name + " {";
@@ -115,10 +126,83 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                 return null;
             }
             interfaceString += utilities_1.indent(fieldName);
-            if (!isNestedSchemaType(fieldConfig) && !fieldConfig.required) {
+            var supportedType;
+            if (isNestedSchemaType(fieldConfig)) {
+                supportedType = utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL;
+            }
+            else {
+                supportedType = determineSupportedType(fieldConfig.type);
+            }
+            /**
+             * Unsupported type
+             */
+            if (supportedType === utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED) {
+                throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
+            }
+            var interfaceVal = '';
+            /**
+             * Nested schema type
+             */
+            if (supportedType === utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL) {
+                if (fieldConfig.type && fieldConfig.type.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.MIXED) {
+                    interfaceVal = '{}';
+                }
+                else {
+                    var nestedInterfaceName = formatNestedInterfaceName(fieldName);
+                    var nestedInterface = generateInterface(nestedInterfaceName, fieldConfig);
+                    generatedContent += utilities_1.appendNewline(nestedInterface);
+                    interfaceVal = utilities_1.INTERFACE_PREFIX + nestedInterfaceName;
+                }
+            }
+            else if (supportedType === utilities_1.TYPESCRIPT_TYPES.ARRAY) {
+                /**
+                 * Empty array
+                 */
+                if (!fieldConfig.type.length) {
+                    interfaceVal = "" + utilities_1.TYPESCRIPT_TYPES.ANY + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                }
+                else if (isNestedSchemaArrayType(fieldConfig)) {
+                    var nestedSupportedType = determineSupportedType(fieldConfig.type[0]);
+                    if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED) {
+                        throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
+                    }
+                    /**
+                     * Nested ObjectId or Mixed types
+                     */
+                    if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL || nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.STRING) {
+                        interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                    }
+                    else {
+                        /**
+                         * Array of nested schema types
+                         */
+                        var nestedInterfaceName = formatNestedInterfaceName(fieldName);
+                        var nestedInterface = generateInterface(nestedInterfaceName, fieldConfig.type[0]);
+                        generatedContent += utilities_1.appendNewline(nestedInterface);
+                        interfaceVal = utilities_1.INTERFACE_PREFIX + nestedInterfaceName + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                    }
+                }
+                else {
+                    /**
+                     * Array of single value types
+                     */
+                    var nestedSupportedType = determineSupportedType(fieldConfig.type[0]);
+                    if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED) {
+                        throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
+                    }
+                    interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                }
+            }
+            else {
+                /**
+                 * Single value types
+                 */
+                interfaceVal = generateInterfaceFieldValue(supportedType, fieldConfig);
+            }
+            if (!isNestedSchemaType(fieldConfig) && !isNestedSchemaArrayType(fieldConfig) && !fieldConfig.required) {
                 interfaceString += utilities_1.TYPESCRIPT_TYPES.OPTIONAL_PROP;
             }
-            interfaceString += ': ' + generateFieldTypeString(fieldName, fieldConfig);
+            interfaceString += ": " + interfaceVal;
             interfaceString += ';';
             interfaceString = utilities_1.appendNewline(interfaceString);
         });

@@ -8,11 +8,14 @@ export declare const TYPESCRIPT_TYPES: {
     STRING: string;
     NUMBER: string;
     BOOLEAN: string;
+    ARRAY: string;
     DATE: string;
     OBJECT_LITERAL: string;
     ANY: string;
     ARRAY_THEREOF: string;
     OPTIONAL_PROP: string;
+    UNSUPPORTED: string;
+    SCHEMA: string;
 };
 export declare const MONGOOSE_SCHEMA_TYPES: {
     OBJECT_ID: string;
