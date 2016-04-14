@@ -40,7 +40,9 @@ function isNestedSchemaArrayType(fieldConfig: any): boolean {
  * @private
  */
 function isVirtualType(fieldConfig: any): boolean {
-	return fieldConfig instanceof VirtualType
+	// In some cases fieldConfig will not pass true for instanceof, do some additional duck typing
+	const looksLikeVirtualType = (fieldConfig && fieldConfig.path && Array.isArray(fieldConfig.getters) && Array.isArray(fieldConfig.setters) && typeof fieldConfig.options === 'object')
+	return fieldConfig instanceof VirtualType || looksLikeVirtualType
 }
 
 /**
@@ -57,7 +59,8 @@ function hasEnumValues(fieldConfig: any): boolean {
  * @private
  */
 function getSchemaConfig(rawSchema: any): any {
-	if (rawSchema instanceof Schema) {
+	// In some cases rawSchema will not pass true for instanceof, do some additional duck typing
+	if (rawSchema instanceof Schema || rawSchema.tree) {
 		return rawSchema.tree
 	}
 	return rawSchema

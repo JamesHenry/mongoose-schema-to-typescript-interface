@@ -29,7 +29,9 @@ function isNestedSchemaArrayType(fieldConfig) {
  * @private
  */
 function isVirtualType(fieldConfig) {
-    return fieldConfig instanceof mongoose_1.VirtualType;
+    // In some cases fieldConfig will not pass true for instanceof, do some additional duck typing
+    var looksLikeVirtualType = (fieldConfig && fieldConfig.path && Array.isArray(fieldConfig.getters) && Array.isArray(fieldConfig.setters) && typeof fieldConfig.options === 'object');
+    return fieldConfig instanceof mongoose_1.VirtualType || looksLikeVirtualType;
 }
 /**
  * Return true if the given mongoose field config has enum values
@@ -44,7 +46,8 @@ function hasEnumValues(fieldConfig) {
  * @private
  */
 function getSchemaConfig(rawSchema) {
-    if (rawSchema instanceof mongoose_1.Schema) {
+    // In some cases rawSchema will not pass true for instanceof, do some additional duck typing
+    if (rawSchema instanceof mongoose_1.Schema || rawSchema.tree) {
         return rawSchema.tree;
     }
     return rawSchema;
