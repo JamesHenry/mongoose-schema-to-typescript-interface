@@ -222,5 +222,89 @@ describe("generateInterface", function () {
         var output = "interface IMultipleNested {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tmultipleNested: IMultipleNested[];\n}\n";
         chai_1.expect(input).to.equal(output);
     });
+    it("should process a complex example", function () {
+        var nestedSchema = new mongoose_1.Schema({
+            thing: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'Thing',
+            },
+        }, {});
+        var nestedItemSchema = new mongoose_1.Schema({
+            user: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true,
+            },
+            priority: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+        }, {
+            _id: false,
+            id: false,
+        });
+        var mainSchema = new mongoose_1.Schema({
+            name: {
+                type: String,
+                required: true,
+                index: true,
+                placeholder: 'PLACEHOLDER_NAME',
+            },
+            referencedDocument: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'RefDoc',
+                immutable: true,
+                required: true,
+            },
+            stringOptionsWithDefault: {
+                type: String,
+                required: true,
+                default: 'defaultVal',
+                enum: ['defaultVal', 'Option2'],
+            },
+            setting_type: {
+                type: String,
+            },
+            setting_value: {
+                type: Number,
+                min: 0,
+                validate: function validate(val) {
+                    if (this.setting_type === 'foo') {
+                        if (val > 1) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+            },
+            enabled: {
+                type: Boolean,
+                required: true,
+                default: false,
+            },
+            nestedSchema: nestedSchema,
+            nestedInline: {
+                prop: {
+                    type: Number,
+                    required: true,
+                },
+            },
+            nestedEmptyInline: {},
+            nestedItems: {
+                type: [nestedItemSchema],
+            },
+        }, {
+            strict: true,
+        });
+        mainSchema.foo = 'bar';
+        mainSchema.searchable = true;
+        mainSchema.index({
+            name: 'text',
+        });
+        var input = generate_interface_1.default("MainInterface", mainSchema);
+        var output = "interface INestedSchema {\n\tthing?: string;\n\t_id?: string;\n}\n\ninterface INestedInline {\n\tprop: number;\n}\n\ninterface INestedEmptyInline {}\n\ninterface INestedItems {\n\tuser: string;\n\tpriority: number;\n}\n\ninterface IMainInterface {\n\tname: string;\n\treferencedDocument: string;\n\tstringOptionsWithDefault: 'defaultVal' | 'Option2';\n\tsetting_type?: string;\n\tsetting_value?: number;\n\tenabled: boolean;\n\tnestedSchema: INestedSchema;\n\tnestedInline: INestedInline;\n\tnestedEmptyInline: INestedEmptyInline;\n\tnestedItems: INestedItems[];\n\t_id?: string;\n}\n";
+        chai_1.expect(input).to.equal(output);
+    });
 });
 //# sourceMappingURL=generate-interface.spec.js.map

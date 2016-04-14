@@ -402,4 +402,126 @@ interface IMainInterface {
 
 	})
 
+	it(`should process a complex example`, () => {
+
+		const nestedSchema = new Schema({
+			thing: {
+				type: Schema.Types.ObjectId,
+				ref: 'Thing',
+			},
+		}, {})
+
+		const nestedItemSchema = new Schema({
+			user: {
+				type: Schema.Types.ObjectId,
+				ref: 'User',
+				required: true,
+			},
+			priority: {
+				type: Number,
+				required: true,
+				default: 0,
+			},
+		}, {
+			_id: false,
+			id: false,
+		})
+
+		const mainSchema: any = new Schema({
+			name: {
+				type: String,
+				required: true,
+				index: true,
+				placeholder: 'PLACEHOLDER_NAME',
+			},
+			referencedDocument: {
+				type: Schema.Types.ObjectId,
+				ref: 'RefDoc',
+				immutable: true,
+				required: true,
+			},
+			stringOptionsWithDefault: {
+				type: String,
+				required: true,
+				default: 'defaultVal',
+				enum: ['defaultVal', 'Option2'],
+			},
+			setting_type: {
+				type: String,
+			},
+			setting_value: {
+				type: Number,
+				min: 0,
+				validate: function validate(val: any) {
+					if (this.setting_type === 'foo') {
+						if (val > 1) {
+							return false
+						}
+					}
+					return true
+				},
+			},
+			enabled: {
+				type: Boolean,
+				required: true,
+				default: false,
+			},
+			nestedSchema: nestedSchema,
+			nestedInline: {
+				prop: {
+					type: Number,
+					required: true,
+				},
+			},
+			nestedEmptyInline: {},
+			nestedItems: {
+				type: [nestedItemSchema],
+			},
+		}, {
+			strict: true,
+		})
+
+		mainSchema.foo = 'bar'
+		mainSchema.searchable = true
+		mainSchema.index({
+			name: 'text',
+		})
+
+		const input = generateInterface(`MainInterface`, mainSchema)
+
+		const output = `interface INestedSchema {
+	thing?: string;
+	_id?: string;
+}
+
+interface INestedInline {
+	prop: number;
+}
+
+interface INestedEmptyInline {}
+
+interface INestedItems {
+	user: string;
+	priority: number;
+}
+
+interface IMainInterface {
+	name: string;
+	referencedDocument: string;
+	stringOptionsWithDefault: 'defaultVal' | 'Option2';
+	setting_type?: string;
+	setting_value?: number;
+	enabled: boolean;
+	nestedSchema: INestedSchema;
+	nestedInline: INestedInline;
+	nestedEmptyInline: INestedEmptyInline;
+	nestedItems: INestedItems[];
+	_id?: string;
+}
+`
+
+		expect(input).to.equal(output)
+
+	})
+
 })

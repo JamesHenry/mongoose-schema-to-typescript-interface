@@ -1,4 +1,4 @@
-import { VirtualType } from 'mongoose'
+import { VirtualType, Schema } from 'mongoose'
 
 import {
 	TYPESCRIPT_TYPES,
@@ -24,9 +24,13 @@ function formatNestedInterfaceName(name: string): string {
  * @private
  */
 function isNestedSchemaType(fieldConfig: any): boolean {
-	return !fieldConfig.type && Object.keys(fieldConfig).length > 0
+	return typeof fieldConfig === 'object' && !fieldConfig.type
 }
 
+/**
+ * Return true if the given mongoose field config is an array of nested schema objects
+ * @private
+ */
 function isNestedSchemaArrayType(fieldConfig: any): boolean {
 	return Array.isArray(fieldConfig.type) && fieldConfig.type.every((nestedConfig: any) => isNestedSchemaType(nestedConfig))
 }
@@ -45,6 +49,18 @@ function isVirtualType(fieldConfig: any): boolean {
  */
 function hasEnumValues(fieldConfig: any): boolean {
 	return fieldConfig.enum && fieldConfig.enum.length
+}
+
+/**
+ * If the provided schema has already been instantiated with mongoose,
+ * use the `tree` definition as the schema config
+ * @private
+ */
+function getSchemaConfig(rawSchema: any): any {
+	if (rawSchema instanceof Schema) {
+		return rawSchema.tree
+	}
+	return rawSchema
 }
 
 /**
@@ -75,6 +91,10 @@ function generateStringLiteralTypeFromEnum(enumOptions: string[]): string {
  * @private
  */
 function determineSupportedType(mongooseType: any): string {
+
+	if (!mongooseType) {
+		return TYPESCRIPT_TYPES.UNSUPPORTED
+	}
 
 	switch (true) {
 
@@ -204,7 +224,8 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 				} else {
 
 					const nestedInterfaceName = formatNestedInterfaceName(fieldName)
-					const nestedInterface = generateInterface(nestedInterfaceName, fieldConfig)
+					const nestedSchemaConfig = getSchemaConfig(fieldConfig)
+					const nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig)
 
 					generatedContent += appendNewline(nestedInterface)
 
@@ -223,7 +244,9 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 
 				} else if (isNestedSchemaArrayType(fieldConfig)) {
 
-					const nestedSupportedType = determineSupportedType(fieldConfig.type[0])
+					const nestedSchemaConfig = getSchemaConfig(fieldConfig.type[0])
+					const nestedSupportedType = determineSupportedType(nestedSchemaConfig)
+
 					if (nestedSupportedType === TYPESCRIPT_TYPES.UNSUPPORTED) {
 						throw new Error(`Mongoose type not recognised/supported: ${JSON.stringify(fieldConfig)}`)
 					}
@@ -241,7 +264,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 						 * Array of nested schema types
 						 */
 						const nestedInterfaceName = formatNestedInterfaceName(fieldName)
-						const nestedInterface = generateInterface(nestedInterfaceName, fieldConfig.type[0])
+						const nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig)
 
 						generatedContent += appendNewline(nestedInterface)
 
@@ -290,7 +313,8 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 
 	}
 
-	const mainInterface = generateInterface(interfaceName, rawSchema)
+	const schemaConfig = getSchemaConfig(rawSchema)
+	const mainInterface = generateInterface(interfaceName, schemaConfig)
 
 	generatedContent += mainInterface
 

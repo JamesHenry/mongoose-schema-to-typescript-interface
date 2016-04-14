@@ -15,8 +15,12 @@ function formatNestedInterfaceName(name) {
  * @private
  */
 function isNestedSchemaType(fieldConfig) {
-    return !fieldConfig.type && Object.keys(fieldConfig).length > 0;
+    return typeof fieldConfig === 'object' && !fieldConfig.type;
 }
+/**
+ * Return true if the given mongoose field config is an array of nested schema objects
+ * @private
+ */
 function isNestedSchemaArrayType(fieldConfig) {
     return Array.isArray(fieldConfig.type) && fieldConfig.type.every(function (nestedConfig) { return isNestedSchemaType(nestedConfig); });
 }
@@ -33,6 +37,17 @@ function isVirtualType(fieldConfig) {
  */
 function hasEnumValues(fieldConfig) {
     return fieldConfig.enum && fieldConfig.enum.length;
+}
+/**
+ * If the provided schema has already been instantiated with mongoose,
+ * use the `tree` definition as the schema config
+ * @private
+ */
+function getSchemaConfig(rawSchema) {
+    if (rawSchema instanceof mongoose_1.Schema) {
+        return rawSchema.tree;
+    }
+    return rawSchema;
 }
 /**
  * Convert an array of strings into a stringified TypeScript string literal type
@@ -54,6 +69,9 @@ function generateStringLiteralTypeFromEnum(enumOptions) {
  * @private
  */
 function determineSupportedType(mongooseType) {
+    if (!mongooseType) {
+        return utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED;
+    }
     switch (true) {
         case mongooseType === String:
         case mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
@@ -149,7 +167,8 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                 }
                 else {
                     var nestedInterfaceName = formatNestedInterfaceName(fieldName);
-                    var nestedInterface = generateInterface(nestedInterfaceName, fieldConfig);
+                    var nestedSchemaConfig = getSchemaConfig(fieldConfig);
+                    var nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig);
                     generatedContent += utilities_1.appendNewline(nestedInterface);
                     interfaceVal = utilities_1.INTERFACE_PREFIX + nestedInterfaceName;
                 }
@@ -162,7 +181,8 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                     interfaceVal = "" + utilities_1.TYPESCRIPT_TYPES.ANY + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
                 }
                 else if (isNestedSchemaArrayType(fieldConfig)) {
-                    var nestedSupportedType = determineSupportedType(fieldConfig.type[0]);
+                    var nestedSchemaConfig = getSchemaConfig(fieldConfig.type[0]);
+                    var nestedSupportedType = determineSupportedType(nestedSchemaConfig);
                     if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED) {
                         throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
                     }
@@ -177,7 +197,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                          * Array of nested schema types
                          */
                         var nestedInterfaceName = formatNestedInterfaceName(fieldName);
-                        var nestedInterface = generateInterface(nestedInterfaceName, fieldConfig.type[0]);
+                        var nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig);
                         generatedContent += utilities_1.appendNewline(nestedInterface);
                         interfaceVal = utilities_1.INTERFACE_PREFIX + nestedInterfaceName + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
                     }
@@ -209,7 +229,8 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
         interfaceString += utilities_1.appendNewline('}');
         return interfaceString;
     }
-    var mainInterface = generateInterface(interfaceName, rawSchema);
+    var schemaConfig = getSchemaConfig(rawSchema);
+    var mainInterface = generateInterface(interfaceName, schemaConfig);
     generatedContent += mainInterface;
     return generatedContent;
 }
