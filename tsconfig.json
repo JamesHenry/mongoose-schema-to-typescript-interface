@@ -15,8 +15,5 @@
 		"./src/generate-interface.ts",
 		"./src/test/generate-interface.spec.ts",
 		"./typings/main.d.ts"
-	],
-	"exclude": [
-		"node_modules"
 	]
 }

@@ -5,7 +5,7 @@ var generate_interface_1 = require('../generate-interface');
 describe("generateInterface", function () {
     it("should return a stringified TypeScript interface", function () {
         var input = generate_interface_1.default("EmptyInterface", {});
-        var output = "interface IEmptyInterface {}\n";
+        var output = "interface IEmptyInterface {}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: ObjectId' to TypeScript type 'string'", function () {
@@ -15,7 +15,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IObjectIdInterface {\n\tid: string;\n}\n";
+        var output = "interface IObjectIdInterface {\n\tid: string;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'required: false' to TypeScript optional property syntax", function () {
@@ -25,7 +25,7 @@ describe("generateInterface", function () {
                 required: false,
             },
         });
-        var output = "interface IOptionalPropInterface {\n\tid?: string;\n}\n";
+        var output = "interface IOptionalPropInterface {\n\tid?: string;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: Mixed' to TypeScript type '{}'", function () {
@@ -35,7 +35,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IMixedInterface {\n\tid: {};\n}\n";
+        var output = "interface IMixedInterface {\n\tid: {};\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: String' to TypeScript type 'string'", function () {
@@ -45,7 +45,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface INameStringInterface {\n\tname: string;\n}\n";
+        var output = "interface INameStringInterface {\n\tname: string;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: String' and 'enum: [...]' to TypeScript 'string literal type'", function () {
@@ -56,7 +56,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IStringOptionsInterface {\n\tchosen_letter: 'a' | 'b' | 'c';\n}\n";
+        var output = "interface IStringOptionsInterface {\n\tchosen_letter: 'a' | 'b' | 'c';\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: Number' to TypeScript type 'number'", function () {
@@ -66,7 +66,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IAgeNumberInterface {\n\tage: number;\n}\n";
+        var output = "interface IAgeNumberInterface {\n\tage: number;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: Number' to TypeScript type 'number'", function () {
@@ -76,7 +76,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IAgeNumberInterface {\n\tage: number;\n}\n";
+        var output = "interface IAgeNumberInterface {\n\tage: number;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: Boolean' to TypeScript type 'boolean'", function () {
@@ -86,7 +86,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IEnabledBooleanInterface {\n\tenabled: boolean;\n}\n";
+        var output = "interface IEnabledBooleanInterface {\n\tenabled: boolean;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: Date' to TypeScript type 'Date'", function () {
@@ -96,7 +96,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IStartInterface {\n\tstart: Date;\n}\n";
+        var output = "interface IStartInterface {\n\tstart: Date;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: []' to TypeScript type 'any[]'", function () {
@@ -106,7 +106,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IAnyListInterface {\n\tstuff: any[];\n}\n";
+        var output = "interface IAnyListInterface {\n\tstuff: any[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: [Number]' to TypeScript type 'number[]'", function () {
@@ -116,7 +116,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface INumberListInterface {\n\tlist: number[];\n}\n";
+        var output = "interface INumberListInterface {\n\tlist: number[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: [String]' to TypeScript type 'string[]'", function () {
@@ -126,7 +126,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface INameListInterface {\n\tnames: string[];\n}\n";
+        var output = "interface INameListInterface {\n\tnames: string[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: [Boolean]' to TypeScript type 'boolean[]'", function () {
@@ -136,7 +136,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IStatusListInterface {\n\tstatuses: boolean[];\n}\n";
+        var output = "interface IStatusListInterface {\n\tstatuses: boolean[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: [Date]' to TypeScript type 'Date[]'", function () {
@@ -146,7 +146,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IDateListInterface {\n\tdates: Date[];\n}\n";
+        var output = "interface IDateListInterface {\n\tdates: Date[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: [ObjectId]' to TypeScript type 'string[]'", function () {
@@ -156,7 +156,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IObjectIdListInterface {\n\tids: string[];\n}\n";
+        var output = "interface IObjectIdListInterface {\n\tids: string[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should convert mongoose 'type: [Mixed]' to TypeScript type '[{}]'", function () {
@@ -166,7 +166,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IMixedListInterface {\n\tid: {}[];\n}\n";
+        var output = "interface IMixedListInterface {\n\tid: {}[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should dynamically create any nested mongoose schemas as TypeScript interfaces", function () {
@@ -178,7 +178,7 @@ describe("generateInterface", function () {
                 },
             },
         });
-        var output = "interface INested {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tnested: INested;\n}\n";
+        var output = "interface IMainInterfaceINested {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tnested: IMainInterfaceINested;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should format nested schema names as TitleCase", function () {
@@ -190,7 +190,7 @@ describe("generateInterface", function () {
                 },
             },
         });
-        var output = "interface ISnakeCase {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tsnake_case: ISnakeCase;\n}\n";
+        var output = "interface IMainInterfaceISnakeCase {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tsnake_case: IMainInterfaceISnakeCase;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should support multiple schema fields on newlines", function () {
@@ -204,7 +204,7 @@ describe("generateInterface", function () {
                 required: true,
             },
         });
-        var output = "interface IMultipleFieldsInterface {\n\tfield1: string;\n\tfield2: string;\n}\n";
+        var output = "interface IMultipleFieldsInterface {\n\tfield1: string;\n\tfield2: string;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should support arrays of nested schemas as a field type", function () {
@@ -219,7 +219,7 @@ describe("generateInterface", function () {
                 type: [nested],
             },
         });
-        var output = "interface IMultipleNested {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tmultipleNested: IMultipleNested[];\n}\n";
+        var output = "interface IMainInterfaceIMultipleNested {\n\tstuff?: string;\n}\n\ninterface IMainInterface {\n\tmultipleNested: IMainInterfaceIMultipleNested[];\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
     it("should process a complex example", function () {
@@ -303,7 +303,7 @@ describe("generateInterface", function () {
             name: 'text',
         });
         var input = generate_interface_1.default("MainInterface", mainSchema);
-        var output = "interface INestedSchema {\n\tthing?: string;\n\t_id?: string;\n}\n\ninterface INestedInline {\n\tprop: number;\n}\n\ninterface INestedEmptyInline {}\n\ninterface INestedItems {\n\tuser: string;\n\tpriority: number;\n}\n\ninterface IMainInterface {\n\tname: string;\n\treferencedDocument: string;\n\tstringOptionsWithDefault: 'defaultVal' | 'Option2';\n\tsetting_type?: string;\n\tsetting_value?: number;\n\tenabled: boolean;\n\tnestedSchema: INestedSchema;\n\tnestedInline: INestedInline;\n\tnestedEmptyInline: INestedEmptyInline;\n\tnestedItems: INestedItems[];\n\t_id?: string;\n}\n";
+        var output = "interface IMainInterfaceINestedSchema {\n\tthing?: string;\n\t_id?: string;\n}\n\ninterface IMainInterfaceINestedInline {\n\tprop: number;\n}\n\ninterface IMainInterfaceINestedEmptyInline {}\n\ninterface IMainInterfaceINestedItems {\n\tuser: string;\n\tpriority: number;\n}\n\ninterface IMainInterface {\n\tname: string;\n\treferencedDocument: string;\n\tstringOptionsWithDefault: 'defaultVal' | 'Option2';\n\tsetting_type?: string;\n\tsetting_value?: number;\n\tenabled: boolean;\n\tnestedSchema: IMainInterfaceINestedSchema;\n\tnestedInline: IMainInterfaceINestedInline;\n\tnestedEmptyInline: IMainInterfaceINestedEmptyInline;\n\tnestedItems: IMainInterfaceINestedItems[];\n\t_id?: string;\n}\n\n";
         chai_1.expect(input).to.equal(output);
     });
 });

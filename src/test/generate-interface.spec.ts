@@ -8,6 +8,7 @@ describe(`generateInterface`, () => {
 
 		const input = generateInterface(`EmptyInterface`, {})
 		const output = `interface IEmptyInterface {}
+
 `
 
 		expect(input).to.equal(output)
@@ -26,6 +27,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IObjectIdInterface {
 	id: string;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -44,6 +46,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IOptionalPropInterface {
 	id?: string;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -62,6 +65,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IMixedInterface {
 	id: {};
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -80,6 +84,7 @@ describe(`generateInterface`, () => {
 		const output = `interface INameStringInterface {
 	name: string;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -99,6 +104,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IStringOptionsInterface {
 	chosen_letter: 'a' | 'b' | 'c';
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -117,6 +123,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IAgeNumberInterface {
 	age: number;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -135,6 +142,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IAgeNumberInterface {
 	age: number;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -153,6 +161,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IEnabledBooleanInterface {
 	enabled: boolean;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -171,6 +180,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IStartInterface {
 	start: Date;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -189,6 +199,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IAnyListInterface {
 	stuff: any[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -207,6 +218,7 @@ describe(`generateInterface`, () => {
 		const output = `interface INumberListInterface {
 	list: number[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -225,6 +237,7 @@ describe(`generateInterface`, () => {
 		const output = `interface INameListInterface {
 	names: string[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -243,6 +256,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IStatusListInterface {
 	statuses: boolean[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -261,6 +275,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IDateListInterface {
 	dates: Date[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -279,6 +294,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IObjectIdListInterface {
 	ids: string[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -297,6 +313,7 @@ describe(`generateInterface`, () => {
 		const output = `interface IMixedListInterface {
 	id: {}[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -314,13 +331,14 @@ describe(`generateInterface`, () => {
 			},
 		})
 
-		const output = `interface INested {
+		const output = `interface IMainInterfaceINested {
 	stuff?: string;
 }
 
 interface IMainInterface {
-	nested: INested;
+	nested: IMainInterfaceINested;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -338,13 +356,14 @@ interface IMainInterface {
 			},
 		})
 
-		const output = `interface ISnakeCase {
+		const output = `interface IMainInterfaceISnakeCase {
 	stuff?: string;
 }
 
 interface IMainInterface {
-	snake_case: ISnakeCase;
+	snake_case: IMainInterfaceISnakeCase;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -368,6 +387,7 @@ interface IMainInterface {
 	field1: string;
 	field2: string;
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -389,13 +409,14 @@ interface IMainInterface {
 			},
 		})
 
-		const output = `interface IMultipleNested {
+		const output = `interface IMainInterfaceIMultipleNested {
 	stuff?: string;
 }
 
 interface IMainInterface {
-	multipleNested: IMultipleNested[];
+	multipleNested: IMainInterfaceIMultipleNested[];
 }
+
 `
 
 		expect(input).to.equal(output)
@@ -489,18 +510,18 @@ interface IMainInterface {
 
 		const input = generateInterface(`MainInterface`, mainSchema)
 
-		const output = `interface INestedSchema {
+		const output = `interface IMainInterfaceINestedSchema {
 	thing?: string;
 	_id?: string;
 }
 
-interface INestedInline {
+interface IMainInterfaceINestedInline {
 	prop: number;
 }
 
-interface INestedEmptyInline {}
+interface IMainInterfaceINestedEmptyInline {}
 
-interface INestedItems {
+interface IMainInterfaceINestedItems {
 	user: string;
 	priority: number;
 }
@@ -512,12 +533,13 @@ interface IMainInterface {
 	setting_type?: string;
 	setting_value?: number;
 	enabled: boolean;
-	nestedSchema: INestedSchema;
-	nestedInline: INestedInline;
-	nestedEmptyInline: INestedEmptyInline;
-	nestedItems: INestedItems[];
+	nestedSchema: IMainInterfaceINestedSchema;
+	nestedInline: IMainInterfaceINestedInline;
+	nestedEmptyInline: IMainInterfaceINestedEmptyInline;
+	nestedItems: IMainInterfaceINestedItems[];
 	_id?: string;
 }
+
 `
 
 		expect(input).to.equal(output)

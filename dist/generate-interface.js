@@ -169,7 +169,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                     interfaceVal = '{}';
                 }
                 else {
-                    var nestedInterfaceName = formatNestedInterfaceName(fieldName);
+                    var nestedInterfaceName = formatNestedInterfaceName(name) + utilities_1.INTERFACE_PREFIX + formatNestedInterfaceName(fieldName);
                     var nestedSchemaConfig = getSchemaConfig(fieldConfig);
                     var nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig);
                     generatedContent += utilities_1.appendNewline(nestedInterface);
@@ -199,7 +199,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                         /**
                          * Array of nested schema types
                          */
-                        var nestedInterfaceName = formatNestedInterfaceName(fieldName);
+                        var nestedInterfaceName = formatNestedInterfaceName(name) + utilities_1.INTERFACE_PREFIX + formatNestedInterfaceName(fieldName);
                         var nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig);
                         generatedContent += utilities_1.appendNewline(nestedInterface);
                         interfaceVal = utilities_1.INTERFACE_PREFIX + nestedInterfaceName + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
@@ -234,7 +234,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
     }
     var schemaConfig = getSchemaConfig(rawSchema);
     var mainInterface = generateInterface(interfaceName, schemaConfig);
-    generatedContent += mainInterface;
+    generatedContent += utilities_1.appendNewline(mainInterface);
     return generatedContent;
 }
 Object.defineProperty(exports, "__esModule", { value: true });

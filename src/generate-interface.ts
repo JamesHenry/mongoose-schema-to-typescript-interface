@@ -226,7 +226,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 
 				} else {
 
-					const nestedInterfaceName = formatNestedInterfaceName(fieldName)
+					const nestedInterfaceName = formatNestedInterfaceName(name) + INTERFACE_PREFIX + formatNestedInterfaceName(fieldName)
 					const nestedSchemaConfig = getSchemaConfig(fieldConfig)
 					const nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig)
 
@@ -266,7 +266,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 						/**
 						 * Array of nested schema types
 						 */
-						const nestedInterfaceName = formatNestedInterfaceName(fieldName)
+						const nestedInterfaceName = formatNestedInterfaceName(name) + INTERFACE_PREFIX + formatNestedInterfaceName(fieldName)
 						const nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig)
 
 						generatedContent += appendNewline(nestedInterface)
@@ -319,7 +319,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 	const schemaConfig = getSchemaConfig(rawSchema)
 	const mainInterface = generateInterface(interfaceName, schemaConfig)
 
-	generatedContent += mainInterface
+	generatedContent += appendNewline(mainInterface)
 
 	return generatedContent
 
