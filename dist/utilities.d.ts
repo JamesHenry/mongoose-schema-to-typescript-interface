@@ -4,6 +4,7 @@
 export declare const INDENT_CHAR: string;
 export declare const NEWLINE_CHAR: string;
 export declare const INTERFACE_PREFIX: string;
+export declare const REF_PATH_DELIMITER: string;
 export declare const TYPESCRIPT_TYPES: {
     STRING: string;
     NUMBER: string;

@@ -9,6 +9,7 @@ import generateInterface  from './generate-interface'
 export const INDENT_CHAR = '\t'
 export const NEWLINE_CHAR = '\n'
 export const INTERFACE_PREFIX = 'I'
+export const REF_PATH_DELIMITER = '::'
 export const TYPESCRIPT_TYPES = {
 	STRING: 'string',
 	NUMBER: 'number',
@@ -93,6 +94,10 @@ export function generateOutput(moduleName: string, currentDir: string, schemaFil
 
 }
 
+function stripInterface(str: string): string {
+	return str.replace('interface ', '').replace(' {', '')
+}
+
 export function extendRefTypes(generatedOutput: string, refMapping: any = {}): string {
 
 	const refPaths = Object.keys(refMapping)
@@ -104,50 +109,48 @@ export function extendRefTypes(generatedOutput: string, refMapping: any = {}): s
 
 	refPaths.forEach((refPath) => {
 
-		const [interfaceName, propertyName] = refPath.split('_')
+		const [interfaceName, propertyName] = refPath.split(REF_PATH_DELIMITER)
 		const refValue = refMapping[refPath]
+		const targetInterfaceStartRegexp = new RegExp(`interface ${interfaceName} {`)
 
-		function stripInterface(str: string): string {
-			return str.replace('interface ', '').replace(' {', '')
-		}
-
-		// Find matching interface for refValue
-		const exact = generatedOutput.match(new RegExp(`interface ${refValue} {`))
-		const prefixed = generatedOutput.match(new RegExp(`interface ${INTERFACE_PREFIX}${refValue} {`))
-		const prefixedAndSuffixed = generatedOutput.match(new RegExp(`interface ${INTERFACE_PREFIX}${refValue}\\w+ {`))
-
-		let matchingReferencedInterfaceName: string
-
-		if (exact) {
-			matchingReferencedInterfaceName = stripInterface(exact[0])
-		} else if (prefixed) {
-			matchingReferencedInterfaceName = stripInterface(prefixed[0])
-		} else if (prefixedAndSuffixed) {
-			matchingReferencedInterfaceName = stripInterface(prefixedAndSuffixed[0])
-		}
-
-		if (!matchingReferencedInterfaceName) {
+		/**
+		 * Check the given output for an applicable interface for the refValue
+		 */
+		const refInterfaceStartRegexp = new RegExp(`interface ${INTERFACE_PREFIX}${refValue} {`)
+		const foundInterface = generatedOutput.match(refInterfaceStartRegexp)
+		if (!foundInterface) {
 			return null
 		}
 
+		const matchingReferencedInterfaceName: string = stripInterface(foundInterface[0])
+
+		/**
+		 * Split the given output by line
+		 */
 		const outputLines = generatedOutput.split('\n')
+
+		/**
+		 * Locate the start of the target interface
+		 */
 		let startIndexOfTargetInterface: number
-		outputLines.forEach((line, index) => {
-			if (line.indexOf(interfaceName) > -1) {
-				startIndexOfTargetInterface = index
+		for (let i = 0; i < outputLines.length; i++) {
+			if (outputLines[i].match(targetInterfaceStartRegexp)) {
+				startIndexOfTargetInterface = i;
+				break;
 			}
-		})
+		}
 
 		if (typeof startIndexOfTargetInterface !== 'number') {
 			return null
 		}
 
 		let endIndexOfTargetInterface: number
-		outputLines.forEach((line, index) => {
-			if (index > startIndexOfTargetInterface && line.indexOf('}') > -1) {
-				endIndexOfTargetInterface = index
+		for (let i = startIndexOfTargetInterface; i < outputLines.length; i++) {
+			if (outputLines[i].indexOf('}') > -1) {
+				endIndexOfTargetInterface = i;
+				break;
 			}
-		})
+		}
 
 		const refPropertyRegexp = new RegExp(`${propertyName}: string;`)
 		const updatedLines = outputLines.map((line, index) => {

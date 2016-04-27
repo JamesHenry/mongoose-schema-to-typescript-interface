@@ -7,6 +7,7 @@ var generate_interface_1 = require('./generate-interface');
 exports.INDENT_CHAR = '\t';
 exports.NEWLINE_CHAR = '\n';
 exports.INTERFACE_PREFIX = 'I';
+exports.REF_PATH_DELIMITER = '::';
 exports.TYPESCRIPT_TYPES = {
     STRING: 'string',
     NUMBER: 'number',
@@ -78,6 +79,9 @@ function generateOutput(moduleName, currentDir, schemaFiles, extendRefs) {
     return output;
 }
 exports.generateOutput = generateOutput;
+function stripInterface(str) {
+    return str.replace('interface ', '').replace(' {', '');
+}
 function extendRefTypes(generatedOutput, refMapping) {
     if (refMapping === void 0) { refMapping = {}; }
     var refPaths = Object.keys(refMapping);
@@ -86,44 +90,42 @@ function extendRefTypes(generatedOutput, refMapping) {
     }
     var updatedOutput = generatedOutput;
     refPaths.forEach(function (refPath) {
-        var _a = refPath.split('_'), interfaceName = _a[0], propertyName = _a[1];
+        var _a = refPath.split(exports.REF_PATH_DELIMITER), interfaceName = _a[0], propertyName = _a[1];
         var refValue = refMapping[refPath];
-        function stripInterface(str) {
-            return str.replace('interface ', '').replace(' {', '');
-        }
-        // Find matching interface for refValue
-        var exact = generatedOutput.match(new RegExp("interface " + refValue + " {"));
-        var prefixed = generatedOutput.match(new RegExp("interface " + exports.INTERFACE_PREFIX + refValue + " {"));
-        var prefixedAndSuffixed = generatedOutput.match(new RegExp("interface " + exports.INTERFACE_PREFIX + refValue + "\\w+ {"));
-        var matchingReferencedInterfaceName;
-        if (exact) {
-            matchingReferencedInterfaceName = stripInterface(exact[0]);
-        }
-        else if (prefixed) {
-            matchingReferencedInterfaceName = stripInterface(prefixed[0]);
-        }
-        else if (prefixedAndSuffixed) {
-            matchingReferencedInterfaceName = stripInterface(prefixedAndSuffixed[0]);
-        }
-        if (!matchingReferencedInterfaceName) {
+        var targetInterfaceStartRegexp = new RegExp("interface " + interfaceName + " {");
+        /**
+         * Check the given output for an applicable interface for the refValue
+         */
+        var refInterfaceStartRegexp = new RegExp("interface " + exports.INTERFACE_PREFIX + refValue + " {");
+        var foundInterface = generatedOutput.match(refInterfaceStartRegexp);
+        if (!foundInterface) {
             return null;
         }
+        var matchingReferencedInterfaceName = stripInterface(foundInterface[0]);
+        /**
+         * Split the given output by line
+         */
         var outputLines = generatedOutput.split('\n');
+        /**
+         * Locate the start of the target interface
+         */
         var startIndexOfTargetInterface;
-        outputLines.forEach(function (line, index) {
-            if (line.indexOf(interfaceName) > -1) {
-                startIndexOfTargetInterface = index;
+        for (var i = 0; i < outputLines.length; i++) {
+            if (outputLines[i].match(targetInterfaceStartRegexp)) {
+                startIndexOfTargetInterface = i;
+                break;
             }
-        });
+        }
         if (typeof startIndexOfTargetInterface !== 'number') {
             return null;
         }
         var endIndexOfTargetInterface;
-        outputLines.forEach(function (line, index) {
-            if (index > startIndexOfTargetInterface && line.indexOf('}') > -1) {
-                endIndexOfTargetInterface = index;
+        for (var i = startIndexOfTargetInterface; i < outputLines.length; i++) {
+            if (outputLines[i].indexOf('}') > -1) {
+                endIndexOfTargetInterface = i;
+                break;
             }
-        });
+        }
         var refPropertyRegexp = new RegExp(propertyName + ": string;");
         var updatedLines = outputLines.map(function (line, index) {
             if (index > startIndexOfTargetInterface && index < endIndexOfTargetInterface) {

@@ -2,6 +2,7 @@ import { expect }     from 'chai'
 import {
 	NEWLINE_CHAR,
 	INDENT_CHAR,
+	REF_PATH_DELIMITER,
 	appendNewline,
 	indent,
 	indentEachLine,
@@ -51,10 +52,10 @@ ${INDENT_CHAR}test3
 		it('should scan the generated output for matching refs and extend the type annotation', () => {
 
 			const refMapping = {
-				'IMainInterface_propWithRef': 'OtherThing',
+				[`IMainInterface${REF_PATH_DELIMITER}propWithRef`]: 'OtherThing',
 			}
 
-			const generatedOutput = `interface OtherThing {
+			const generatedOutput = `interface IOtherThing {
 	foo: string;
 }
 
@@ -64,38 +65,7 @@ interface IMainInterface {
 }
 
 `
-			const expected = `interface OtherThing {
-	foo: string;
-}
-
-interface IMainInterface {
-	propWithRef: string | OtherThing;
-	bar: number;
-}
-
-`
-
-			expect(extendRefTypes(generatedOutput, refMapping)).to.equal(expected)
-
-		})
-
-		it('should support prefixed and suffixed matches of the ref value', () => {
-
-			const refMapping = {
-				'IMainInterface_propWithRef': 'OtherThing',
-			}
-
-			const generatedOutput1 = `interface IOtherThing {
-	foo: string;
-}
-
-interface IMainInterface {
-	propWithRef: string;
-	bar: number;
-}
-
-`
-			const expected1 = `interface IOtherThing {
+			const expected = `interface IOtherThing {
 	foo: string;
 }
 
@@ -106,28 +76,7 @@ interface IMainInterface {
 
 `
 
-const generatedOutput2 = `interface IOtherThingIMoreStuff {
-	foo: string;
-}
-
-interface IMainInterface {
-	propWithRef: string;
-	bar: number;
-}
-
-`
-			const expected2 = `interface IOtherThingIMoreStuff {
-	foo: string;
-}
-
-interface IMainInterface {
-	propWithRef: string | IOtherThingIMoreStuff;
-	bar: number;
-}
-
-`
-
-			expect(extendRefTypes(generatedOutput1, refMapping)).to.equal(expected1)
+			expect(extendRefTypes(generatedOutput, refMapping)).to.equal(expected)
 
 		})
 

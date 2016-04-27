@@ -4,6 +4,7 @@ import {
 	TYPESCRIPT_TYPES,
 	MONGOOSE_SCHEMA_TYPES,
 	INTERFACE_PREFIX,
+	REF_PATH_DELIMITER,
 	appendNewline,
 	indent,
 } from './utilities'
@@ -288,9 +289,9 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 					}
 
 					if (nestedSupportedType === 'OBJECT_ID') {
-						if (fieldConfig.ref) {
-							refMapping[`${INTERFACE_PREFIX}${name}_${fieldName}`] = fieldConfig.ref
-						}
+						// if (fieldConfig.ref) {
+						// 	refMapping[INTERFACE_PREFIX + name + REF_PATH_DELIMITER + fieldName] = fieldConfig.ref
+						// }
 						nestedSupportedType = TYPESCRIPT_TYPES.STRING
 					}
 
@@ -301,9 +302,9 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 			} else {
 
 				if (supportedType === 'OBJECT_ID') {
-					if (fieldConfig.ref) {
-						refMapping[`${INTERFACE_PREFIX}${name}_${fieldName}`] = fieldConfig.ref
-					}
+					// if (fieldConfig.ref) {
+					// 	refMapping[INTERFACE_PREFIX + name + REF_PATH_DELIMITER + fieldName] = fieldConfig.ref
+					// }
 					supportedType = TYPESCRIPT_TYPES.STRING
 				}
 
