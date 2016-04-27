@@ -102,9 +102,11 @@ function determineSupportedType(mongooseType: any): string {
 	switch (true) {
 
 		case mongooseType === String:
+			return TYPESCRIPT_TYPES.STRING
+
 		case mongooseType.schemaName === MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
 		case mongooseType.name === MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
-			return TYPESCRIPT_TYPES.STRING
+			return 'OBJECT_ID'
 
 		case mongooseType === Number:
 			return TYPESCRIPT_TYPES.NUMBER
@@ -174,7 +176,7 @@ function generateInterfaceFieldValue(supportedType: string, fieldConfig: any) {
  * and any requisite nested interfaces
  * @public
  */
-export default function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any): string {
+export default function typescriptInterfaceGenerator(interfaceName: string, rawSchema: any, refMapping: any = {}): string {
 
 	let generatedContent = ''
 
@@ -248,16 +250,16 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 				} else if (isNestedSchemaArrayType(fieldConfig)) {
 
 					const nestedSchemaConfig = getSchemaConfig(fieldConfig.type[0])
-					const nestedSupportedType = determineSupportedType(nestedSchemaConfig)
+					let nestedSupportedType = determineSupportedType(nestedSchemaConfig)
 
 					if (nestedSupportedType === TYPESCRIPT_TYPES.UNSUPPORTED) {
 						throw new Error(`Mongoose type not recognised/supported: ${JSON.stringify(fieldConfig)}`)
 					}
 
 					/**
-					 * Nested ObjectId or Mixed types
+					 * Nested Mixed types
 					 */
-					if (nestedSupportedType === TYPESCRIPT_TYPES.OBJECT_LITERAL || nestedSupportedType === TYPESCRIPT_TYPES.STRING) {
+					if (nestedSupportedType === TYPESCRIPT_TYPES.OBJECT_LITERAL) {
 
 						interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + TYPESCRIPT_TYPES.ARRAY_THEREOF
 
@@ -280,9 +282,16 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 					/**
 					 * Array of single value types
 					 */
-					const nestedSupportedType = determineSupportedType(fieldConfig.type[0])
+					let nestedSupportedType = determineSupportedType(fieldConfig.type[0])
 					if (nestedSupportedType === TYPESCRIPT_TYPES.UNSUPPORTED) {
 						throw new Error(`Mongoose type not recognised/supported: ${JSON.stringify(fieldConfig)}`)
+					}
+
+					if (nestedSupportedType === 'OBJECT_ID') {
+						if (fieldConfig.ref) {
+							refMapping[`${INTERFACE_PREFIX}${name}_${fieldName}`] = fieldConfig.ref
+						}
+						nestedSupportedType = TYPESCRIPT_TYPES.STRING
 					}
 
 					interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + TYPESCRIPT_TYPES.ARRAY_THEREOF
@@ -290,6 +299,13 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 				}
 
 			} else {
+
+				if (supportedType === 'OBJECT_ID') {
+					if (fieldConfig.ref) {
+						refMapping[`${INTERFACE_PREFIX}${name}_${fieldName}`] = fieldConfig.ref
+					}
+					supportedType = TYPESCRIPT_TYPES.STRING
+				}
 
 				/**
 				 * Single value types

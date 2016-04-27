@@ -34,4 +34,5 @@ export declare function indent(str: string): string;
  * resulting strings with the indentation character
  */
 export declare function indentEachLine(content: string): string;
-export declare function generateOutput(moduleName: string, currentDir: string, schemaFiles: any[]): string;
+export declare function generateOutput(moduleName: string, currentDir: string, schemaFiles: any[], extendRefs?: boolean): string;
+export declare function extendRefTypes(generatedOutput: string, refMapping?: any): string;

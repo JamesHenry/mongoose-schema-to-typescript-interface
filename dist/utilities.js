@@ -58,8 +58,10 @@ function indentEachLine(content) {
         .join(exports.NEWLINE_CHAR);
 }
 exports.indentEachLine = indentEachLine;
-function generateOutput(moduleName, currentDir, schemaFiles) {
+function generateOutput(moduleName, currentDir, schemaFiles, extendRefs) {
+    if (extendRefs === void 0) { extendRefs = false; }
     var output = "";
+    var refMapping = {};
     for (var _i = 0, schemaFiles_1 = schemaFiles; _i < schemaFiles_1.length; _i++) {
         var schemaFile = schemaFiles_1[_i];
         var interfaceName = schemaFile.name;
@@ -67,10 +69,74 @@ function generateOutput(moduleName, currentDir, schemaFiles) {
         if (!interfaceName) {
             throw new Error("Schema file does not export a 'name': " + schemaFile);
         }
-        output += generate_interface_1.default(interfaceName, schemaTree);
+        output += generate_interface_1.default(interfaceName, schemaTree, refMapping);
+    }
+    if (extendRefs) {
+        output = extendRefTypes(output, refMapping);
     }
     output = generate_module_1.default(moduleName, output);
     return output;
 }
 exports.generateOutput = generateOutput;
+function extendRefTypes(generatedOutput, refMapping) {
+    if (refMapping === void 0) { refMapping = {}; }
+    var refPaths = Object.keys(refMapping);
+    if (!refPaths || !refPaths.length) {
+        return generatedOutput;
+    }
+    var updatedOutput = generatedOutput;
+    refPaths.forEach(function (refPath) {
+        var _a = refPath.split('_'), interfaceName = _a[0], propertyName = _a[1];
+        var refValue = refMapping[refPath];
+        function stripInterface(str) {
+            return str.replace('interface ', '').replace(' {', '');
+        }
+        // Find matching interface for refValue
+        var exact = generatedOutput.match(new RegExp("interface " + refValue + " {"));
+        var prefixed = generatedOutput.match(new RegExp("interface " + exports.INTERFACE_PREFIX + refValue + " {"));
+        var prefixedAndSuffixed = generatedOutput.match(new RegExp("interface " + exports.INTERFACE_PREFIX + refValue + "\\w+ {"));
+        var matchingReferencedInterfaceName;
+        if (exact) {
+            matchingReferencedInterfaceName = stripInterface(exact[0]);
+        }
+        else if (prefixed) {
+            matchingReferencedInterfaceName = stripInterface(prefixed[0]);
+        }
+        else if (prefixedAndSuffixed) {
+            matchingReferencedInterfaceName = stripInterface(prefixedAndSuffixed[0]);
+        }
+        if (!matchingReferencedInterfaceName) {
+            return null;
+        }
+        var outputLines = generatedOutput.split('\n');
+        var startIndexOfTargetInterface;
+        outputLines.forEach(function (line, index) {
+            if (line.indexOf(interfaceName) > -1) {
+                startIndexOfTargetInterface = index;
+            }
+        });
+        if (typeof startIndexOfTargetInterface !== 'number') {
+            return null;
+        }
+        var endIndexOfTargetInterface;
+        outputLines.forEach(function (line, index) {
+            if (index > startIndexOfTargetInterface && line.indexOf('}') > -1) {
+                endIndexOfTargetInterface = index;
+            }
+        });
+        var refPropertyRegexp = new RegExp(propertyName + ": string;");
+        var updatedLines = outputLines.map(function (line, index) {
+            if (index > startIndexOfTargetInterface && index < endIndexOfTargetInterface) {
+                var targetFieldDefinition = line.match(refPropertyRegexp);
+                if (targetFieldDefinition) {
+                    return line.replace("string;", "string | " + matchingReferencedInterfaceName + ";");
+                }
+            }
+            return line;
+        });
+        updatedOutput = updatedLines.join('\n');
+    });
+    return updatedOutput;
+}
+exports.extendRefTypes = extendRefTypes;
 //# sourceMappingURL=utilities.js.map

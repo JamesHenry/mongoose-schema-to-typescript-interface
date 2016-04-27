@@ -77,9 +77,10 @@ function determineSupportedType(mongooseType) {
     }
     switch (true) {
         case mongooseType === String:
+            return utilities_1.TYPESCRIPT_TYPES.STRING;
         case mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
         case mongooseType.name === utilities_1.MONGOOSE_SCHEMA_TYPES.OBJECT_ID:
-            return utilities_1.TYPESCRIPT_TYPES.STRING;
+            return 'OBJECT_ID';
         case mongooseType === Number:
             return utilities_1.TYPESCRIPT_TYPES.NUMBER;
         case mongooseType.schemaName === utilities_1.MONGOOSE_SCHEMA_TYPES.MIXED:
@@ -132,7 +133,8 @@ function generateInterfaceFieldValue(supportedType, fieldConfig) {
  * and any requisite nested interfaces
  * @public
  */
-function typescriptInterfaceGenerator(interfaceName, rawSchema) {
+function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
+    if (refMapping === void 0) { refMapping = {}; }
     var generatedContent = '';
     function generateInterface(name, fromSchema) {
         var fields = Object.keys(fromSchema).filter(filterOutInvalidFields);
@@ -190,9 +192,9 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                         throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
                     }
                     /**
-                     * Nested ObjectId or Mixed types
+                     * Nested Mixed types
                      */
-                    if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL || nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.STRING) {
+                    if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL) {
                         interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
                     }
                     else {
@@ -213,10 +215,22 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema) {
                     if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.UNSUPPORTED) {
                         throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
                     }
+                    if (nestedSupportedType === 'OBJECT_ID') {
+                        if (fieldConfig.ref) {
+                            refMapping[("" + utilities_1.INTERFACE_PREFIX + name + "_" + fieldName)] = fieldConfig.ref;
+                        }
+                        nestedSupportedType = utilities_1.TYPESCRIPT_TYPES.STRING;
+                    }
                     interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
                 }
             }
             else {
+                if (supportedType === 'OBJECT_ID') {
+                    if (fieldConfig.ref) {
+                        refMapping[("" + utilities_1.INTERFACE_PREFIX + name + "_" + fieldName)] = fieldConfig.ref;
+                    }
+                    supportedType = utilities_1.TYPESCRIPT_TYPES.STRING;
+                }
                 /**
                  * Single value types
                  */

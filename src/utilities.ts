@@ -65,9 +65,10 @@ export function indentEachLine(content: string): string {
 		.join(NEWLINE_CHAR)
 }
 
-export function generateOutput(moduleName: string, currentDir: string, schemaFiles: any[]): string {
+export function generateOutput(moduleName: string, currentDir: string, schemaFiles: any[], extendRefs: boolean = false): string {
 
 	let output = ``
+	const refMapping = {}
 
 	for (const schemaFile of schemaFiles) {
 
@@ -78,12 +79,94 @@ export function generateOutput(moduleName: string, currentDir: string, schemaFil
 			throw new Error(`Schema file does not export a 'name': ${schemaFile}`)
 		}
 
-		output += generateInterface(interfaceName, schemaTree)
+		output += generateInterface(interfaceName, schemaTree, refMapping)
 
+	}
+
+	if (extendRefs) {
+		output = extendRefTypes(output, refMapping)
 	}
 
 	output = generateModule(moduleName, output)
 
 	return output
+
+}
+
+export function extendRefTypes(generatedOutput: string, refMapping: any = {}): string {
+
+	const refPaths = Object.keys(refMapping)
+	if (!refPaths || !refPaths.length) {
+		return generatedOutput
+	}
+
+	let updatedOutput = generatedOutput
+
+	refPaths.forEach((refPath) => {
+
+		const [interfaceName, propertyName] = refPath.split('_')
+		const refValue = refMapping[refPath]
+
+		function stripInterface(str: string): string {
+			return str.replace('interface ', '').replace(' {', '')
+		}
+
+		// Find matching interface for refValue
+		const exact = generatedOutput.match(new RegExp(`interface ${refValue} {`))
+		const prefixed = generatedOutput.match(new RegExp(`interface ${INTERFACE_PREFIX}${refValue} {`))
+		const prefixedAndSuffixed = generatedOutput.match(new RegExp(`interface ${INTERFACE_PREFIX}${refValue}\\w+ {`))
+
+		let matchingReferencedInterfaceName: string
+
+		if (exact) {
+			matchingReferencedInterfaceName = stripInterface(exact[0])
+		} else if (prefixed) {
+			matchingReferencedInterfaceName = stripInterface(prefixed[0])
+		} else if (prefixedAndSuffixed) {
+			matchingReferencedInterfaceName = stripInterface(prefixedAndSuffixed[0])
+		}
+
+		if (!matchingReferencedInterfaceName) {
+			return null
+		}
+
+		const outputLines = generatedOutput.split('\n')
+		let startIndexOfTargetInterface: number
+		outputLines.forEach((line, index) => {
+			if (line.indexOf(interfaceName) > -1) {
+				startIndexOfTargetInterface = index
+			}
+		})
+
+		if (typeof startIndexOfTargetInterface !== 'number') {
+			return null
+		}
+
+		let endIndexOfTargetInterface: number
+		outputLines.forEach((line, index) => {
+			if (index > startIndexOfTargetInterface && line.indexOf('}') > -1) {
+				endIndexOfTargetInterface = index
+			}
+		})
+
+		const refPropertyRegexp = new RegExp(`${propertyName}: string;`)
+		const updatedLines = outputLines.map((line, index) => {
+
+			if (index > startIndexOfTargetInterface && index < endIndexOfTargetInterface) {
+				const targetFieldDefinition = line.match(refPropertyRegexp)
+				if (targetFieldDefinition) {
+					return line.replace(`string;`, `string | ${matchingReferencedInterfaceName};`)
+				}
+			}
+
+			return line
+
+		})
+
+		updatedOutput = updatedLines.join('\n')
+
+	})
+
+	return updatedOutput
 
 }

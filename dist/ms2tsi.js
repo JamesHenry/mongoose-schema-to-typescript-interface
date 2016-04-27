@@ -18,8 +18,9 @@ program
     .command('generate [schemas...]')
     .option('-o, --output-dir <output-dir>', 'Where should the generated .d.ts file be written to?')
     .option('-m, --module-name <module-name>', 'What should the TypeScript module and filename be?')
+    .option('-e, --extend-refs', 'Experimental: Should refs be extended?')
     .action(function (schemas, cmd) {
-    var outputDir = cmd.outputDir, moduleName = cmd.moduleName;
+    var outputDir = cmd.outputDir, moduleName = cmd.moduleName, extendRefs = cmd.extendRefs;
     if (!outputDir) {
         console.error('An output directory is required. Use -o or --output-dir');
         return process.exit(1);
@@ -45,7 +46,7 @@ program
         }
         return schemaFile;
     });
-    var output = utilities_1.generateOutput(moduleName, currentDir, resolvedSchemaFiles);
+    var output = utilities_1.generateOutput(moduleName, currentDir, resolvedSchemaFiles, extendRefs);
     fs.writeFile(path.resolve(currentDir, outputDir + "/" + moduleName + ".d.ts"), output);
 });
 program.parse(process.argv);
