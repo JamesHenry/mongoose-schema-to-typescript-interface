@@ -117,7 +117,7 @@ export function extendRefTypes(generatedOutput: string, refMapping: any = {}): s
 		 * Check the given output for an applicable interface for the refValue
 		 */
 		const refInterfaceStartRegexp = new RegExp(`interface ${INTERFACE_PREFIX}${refValue} {`)
-		const foundInterface = generatedOutput.match(refInterfaceStartRegexp)
+		const foundInterface = updatedOutput.match(refInterfaceStartRegexp)
 		if (!foundInterface) {
 			return null
 		}
@@ -127,7 +127,7 @@ export function extendRefTypes(generatedOutput: string, refMapping: any = {}): s
 		/**
 		 * Split the given output by line
 		 */
-		const outputLines = generatedOutput.split('\n')
+		const outputLines = updatedOutput.split('\n')
 
 		/**
 		 * Locate the start of the target interface

@@ -97,7 +97,7 @@ function extendRefTypes(generatedOutput, refMapping) {
          * Check the given output for an applicable interface for the refValue
          */
         var refInterfaceStartRegexp = new RegExp("interface " + exports.INTERFACE_PREFIX + refValue + " {");
-        var foundInterface = generatedOutput.match(refInterfaceStartRegexp);
+        var foundInterface = updatedOutput.match(refInterfaceStartRegexp);
         if (!foundInterface) {
             return null;
         }
@@ -105,7 +105,7 @@ function extendRefTypes(generatedOutput, refMapping) {
         /**
          * Split the given output by line
          */
-        var outputLines = generatedOutput.split('\n');
+        var outputLines = updatedOutput.split('\n');
         /**
          * Locate the start of the target interface
          */

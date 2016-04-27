@@ -216,9 +216,9 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
                         throw new Error("Mongoose type not recognised/supported: " + JSON.stringify(fieldConfig));
                     }
                     if (nestedSupportedType === 'OBJECT_ID') {
-                        // if (fieldConfig.ref) {
-                        // 	refMapping[INTERFACE_PREFIX + name + REF_PATH_DELIMITER + fieldName] = fieldConfig.ref
-                        // }
+                        if (fieldConfig.ref) {
+                            refMapping[utilities_1.INTERFACE_PREFIX + name + utilities_1.REF_PATH_DELIMITER + fieldName] = fieldConfig.ref;
+                        }
                         nestedSupportedType = utilities_1.TYPESCRIPT_TYPES.STRING;
                     }
                     interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
@@ -226,9 +226,9 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
             }
             else {
                 if (supportedType === 'OBJECT_ID') {
-                    // if (fieldConfig.ref) {
-                    // 	refMapping[INTERFACE_PREFIX + name + REF_PATH_DELIMITER + fieldName] = fieldConfig.ref
-                    // }
+                    if (fieldConfig.ref) {
+                        refMapping[utilities_1.INTERFACE_PREFIX + name + utilities_1.REF_PATH_DELIMITER + fieldName] = fieldConfig.ref;
+                    }
                     supportedType = utilities_1.TYPESCRIPT_TYPES.STRING;
                 }
                 /**
