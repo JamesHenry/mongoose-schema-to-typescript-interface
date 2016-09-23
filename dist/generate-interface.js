@@ -183,7 +183,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
                  * Empty array
                  */
                 if (!fieldConfig.type.length) {
-                    interfaceVal = "" + utilities_1.TYPESCRIPT_TYPES.ANY + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                    interfaceVal = utilities_1.typeArrayOf(utilities_1.TYPESCRIPT_TYPES.ANY);
                 }
                 else if (isNestedSchemaArrayType(fieldConfig)) {
                     var nestedSchemaConfig = getSchemaConfig(fieldConfig.type[0]);
@@ -195,7 +195,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
                      * Nested Mixed types
                      */
                     if (nestedSupportedType === utilities_1.TYPESCRIPT_TYPES.OBJECT_LITERAL) {
-                        interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                        interfaceVal = utilities_1.typeArrayOf(generateInterfaceFieldValue(nestedSupportedType, fieldConfig));
                     }
                     else {
                         /**
@@ -204,7 +204,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
                         var nestedInterfaceName = formatNestedInterfaceName(name) + utilities_1.INTERFACE_PREFIX + formatNestedInterfaceName(fieldName);
                         var nestedInterface = generateInterface(nestedInterfaceName, nestedSchemaConfig);
                         generatedContent += utilities_1.appendNewline(nestedInterface);
-                        interfaceVal = utilities_1.INTERFACE_PREFIX + nestedInterfaceName + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                        interfaceVal = utilities_1.typeArrayOf(utilities_1.INTERFACE_PREFIX + nestedInterfaceName);
                     }
                 }
                 else {
@@ -221,7 +221,7 @@ function typescriptInterfaceGenerator(interfaceName, rawSchema, refMapping) {
                         }
                         nestedSupportedType = utilities_1.TYPESCRIPT_TYPES.STRING;
                     }
-                    interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + utilities_1.TYPESCRIPT_TYPES.ARRAY_THEREOF;
+                    interfaceVal = utilities_1.typeArrayOf(generateInterfaceFieldValue(nestedSupportedType, fieldConfig));
                 }
             }
             else {

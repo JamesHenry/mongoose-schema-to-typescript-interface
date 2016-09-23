@@ -187,7 +187,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: []' to TypeScript type 'any[]'`, () => {
+	it(`should convert mongoose 'type: []' to TypeScript type 'Array<any>'`, () => {
 
 		const input = generateInterface(`AnyListInterface`, {
 			stuff: {
@@ -197,7 +197,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface IAnyListInterface {
-	stuff: any[];
+	stuff: Array<any>;
 }
 
 `
@@ -206,7 +206,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: [Number]' to TypeScript type 'number[]'`, () => {
+	it(`should convert mongoose 'type: [Number]' to TypeScript type 'Array<number>'`, () => {
 
 		const input = generateInterface(`NumberListInterface`, {
 			list: {
@@ -216,7 +216,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface INumberListInterface {
-	list: number[];
+	list: Array<number>;
 }
 
 `
@@ -225,7 +225,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: [String]' to TypeScript type 'string[]'`, () => {
+	it(`should convert mongoose 'type: [String]' to TypeScript type 'Array<string>'`, () => {
 
 		const input = generateInterface(`NameListInterface`, {
 			names: {
@@ -235,7 +235,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface INameListInterface {
-	names: string[];
+	names: Array<string>;
 }
 
 `
@@ -244,7 +244,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: [Boolean]' to TypeScript type 'boolean[]'`, () => {
+	it(`should convert mongoose 'type: [Boolean]' to TypeScript type 'Array<boolean>'`, () => {
 
 		const input = generateInterface(`StatusListInterface`, {
 			statuses: {
@@ -254,7 +254,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface IStatusListInterface {
-	statuses: boolean[];
+	statuses: Array<boolean>;
 }
 
 `
@@ -263,7 +263,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: [Date]' to TypeScript type 'Date[]'`, () => {
+	it(`should convert mongoose 'type: [Date]' to TypeScript type 'Array<Date>'`, () => {
 
 		const input = generateInterface(`DateListInterface`, {
 			dates: {
@@ -273,7 +273,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface IDateListInterface {
-	dates: Date[];
+	dates: Array<Date>;
 }
 
 `
@@ -282,7 +282,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: [ObjectId]' to TypeScript type 'string[]'`, () => {
+	it(`should convert mongoose 'type: [ObjectId]' to TypeScript type 'Array<string>'`, () => {
 
 		const input = generateInterface(`ObjectIdListInterface`, {
 			ids: {
@@ -292,7 +292,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface IObjectIdListInterface {
-	ids: string[];
+	ids: Array<string>;
 }
 
 `
@@ -301,7 +301,7 @@ describe(`generateInterface`, () => {
 
 	})
 
-	it(`should convert mongoose 'type: [Mixed]' to TypeScript type '[{}]'`, () => {
+	it(`should convert mongoose 'type: [Mixed]' to TypeScript type 'Array<{}>'`, () => {
 
 		const input = generateInterface(`MixedListInterface`, {
 			id: {
@@ -311,7 +311,7 @@ describe(`generateInterface`, () => {
 		})
 
 		const output = `interface IMixedListInterface {
-	id: {}[];
+	id: Array<{}>;
 }
 
 `
@@ -414,7 +414,7 @@ interface IMainInterface {
 }
 
 interface IMainInterface {
-	multipleNested: IMainInterfaceIMultipleNested[];
+	multipleNested: Array<IMainInterfaceIMultipleNested>;
 }
 
 `
@@ -536,7 +536,7 @@ interface IMainInterface {
 	nestedSchema: IMainInterfaceINestedSchema;
 	nestedInline: IMainInterfaceINestedInline;
 	nestedEmptyInline: IMainInterfaceINestedEmptyInline;
-	nestedItems: IMainInterfaceINestedItems[];
+	nestedItems: Array<IMainInterfaceINestedItems>;
 	_id?: string;
 }
 

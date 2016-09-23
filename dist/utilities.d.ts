@@ -22,6 +22,7 @@ export declare const MONGOOSE_SCHEMA_TYPES: {
     OBJECT_ID: string;
     MIXED: string;
 };
+export declare function typeArrayOf(str: string): string;
 /**
  * Append the newline character to a given string
  */

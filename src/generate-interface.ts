@@ -7,6 +7,7 @@ import {
 	REF_PATH_DELIMITER,
 	appendNewline,
 	indent,
+	typeArrayOf,
 } from './utilities'
 
 const camelCase = require('lodash.camelcase')
@@ -246,7 +247,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 				 */
 				if (!fieldConfig.type.length) {
 
-					interfaceVal = `${TYPESCRIPT_TYPES.ANY}${TYPESCRIPT_TYPES.ARRAY_THEREOF}`
+					interfaceVal = typeArrayOf(TYPESCRIPT_TYPES.ANY)
 
 				} else if (isNestedSchemaArrayType(fieldConfig)) {
 
@@ -262,7 +263,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 					 */
 					if (nestedSupportedType === TYPESCRIPT_TYPES.OBJECT_LITERAL) {
 
-						interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + TYPESCRIPT_TYPES.ARRAY_THEREOF
+						interfaceVal = typeArrayOf(generateInterfaceFieldValue(nestedSupportedType, fieldConfig))
 
 					} else {
 
@@ -274,7 +275,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 
 						generatedContent += appendNewline(nestedInterface)
 
-						interfaceVal = INTERFACE_PREFIX + nestedInterfaceName + TYPESCRIPT_TYPES.ARRAY_THEREOF
+						interfaceVal = typeArrayOf(INTERFACE_PREFIX + nestedInterfaceName)
 
 					}
 
@@ -295,7 +296,7 @@ export default function typescriptInterfaceGenerator(interfaceName: string, rawS
 						nestedSupportedType = TYPESCRIPT_TYPES.STRING
 					}
 
-					interfaceVal = generateInterfaceFieldValue(nestedSupportedType, fieldConfig) + TYPESCRIPT_TYPES.ARRAY_THEREOF
+					interfaceVal = typeArrayOf(generateInterfaceFieldValue(nestedSupportedType, fieldConfig))
 
 				}
 

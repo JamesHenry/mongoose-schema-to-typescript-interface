@@ -28,6 +28,10 @@ export const MONGOOSE_SCHEMA_TYPES = {
 	MIXED: 'Mixed',
 }
 
+export function typeArrayOf(str: string): string {
+	return `Array<${str}>`
+}
+
 /**
  * Append the newline character to a given string
  */

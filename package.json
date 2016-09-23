@@ -39,7 +39,7 @@
     "semantic-release": "^4.3.5",
     "tslint": "3.2.1",
     "tslint-eslint-rules": "1.0.1",
-    "typescript": "1.8.10",
+    "typescript": "2.0.3",
     "typings": "0.8.1"
   },
   "config": {

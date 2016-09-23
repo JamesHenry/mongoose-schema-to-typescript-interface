@@ -25,6 +25,10 @@ exports.MONGOOSE_SCHEMA_TYPES = {
     OBJECT_ID: 'ObjectId',
     MIXED: 'Mixed',
 };
+function typeArrayOf(str) {
+    return "Array<" + str + ">";
+}
+exports.typeArrayOf = typeArrayOf;
 /**
  * Append the newline character to a given string
  */
