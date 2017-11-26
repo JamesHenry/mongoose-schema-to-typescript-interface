@@ -1,19 +1,29 @@
 {
-	"compilerOptions": {
-		"noImplicitAny": true,
-		"module": "commonjs",
-		"target": "ES5",
-		"sourceMap": true,
-		"declaration": true
-	},
-	"files": [
-		"./src/ms2tsi.ts",
-		"./src/utilities.ts",
-		"./src/test/utilities.spec.ts",
-		"./src/generate-module.ts",
-		"./src/test/generate-module.spec.ts",
-		"./src/generate-interface.ts",
-		"./src/test/generate-interface.spec.ts",
-		"./typings/main.d.ts"
-	]
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": false,
+    "pretty": true,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": false,
+    /**
+     * TODO: Fix issues
+     */
+    // "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "outDir": "./dist",
+    "types": ["node"],
+    "lib": ["es2015"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }
