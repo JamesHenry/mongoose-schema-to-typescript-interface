@@ -26,20 +26,19 @@
   "homepage":
     "https://github.com/JamesHenry/mongoose-schema-to-typescript-interface#readme",
   "devDependencies": {
-    "@types/commander": "^2.11.0",
-    "@types/jest": "^21.1.8",
-    "@types/mongoose": "^4.7.28",
-    "@types/node": "^8.0.53",
+    "@types/jest": "21.1.8",
+    "@types/mongoose": "4.7.28",
+    "@types/node": "8.0.54",
     "cz-conventional-changelog": "2.1.0",
-    "eslint": "^4.11.0",
-    "husky": "^0.14.3",
-    "jest": "^21.2.1",
-    "lint-staged": "^6.0.0",
-    "prettier-eslint-cli": "^4.4.0",
-    "semantic-release": "^8.2.0",
-    "ts-jest": "^21.2.3",
+    "eslint": "4.12.1",
+    "husky": "0.14.3",
+    "jest": "21.2.1",
+    "lint-staged": "6.0.0",
+    "prettier-eslint-cli": "4.4.1",
+    "semantic-release": "8.2.0",
+    "ts-jest": "21.2.4",
     "typescript": "2.6.2",
-    "typescript-eslint-parser": "^9.0.0"
+    "typescript-eslint-parser": "9.0.1"
   },
   "lint-staged": {
     "src/**/*": ["prettier-eslint --write", "git add"],
