@@ -58,7 +58,7 @@
     "commander": "2.12.2",
     "lodash.camelcase": "4.3.0",
     "lodash.upperfirst": "4.3.1",
-    "mongoose": "4.13.7"
+    "mongoose": "5.6.2"
   },
   "jest": {
     "transform": {
